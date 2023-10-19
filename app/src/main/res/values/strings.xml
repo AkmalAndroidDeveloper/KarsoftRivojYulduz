@@ -1,3 +1,37 @@
 <resources>
     <string name="app_name">KarsoftRivojYulduz</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="orders">Заказы</string>
+    <string name="test_order_title">Заголовок заказа</string>
+    <string name="test_order_id">№1</string>
+    <string name="test_order_location">Саранша авто вокзал</string>
+    <string name="test_order_phone_number">+998901234567</string>
+    <string name="test_order_customer_name">Максим</string>
+    <string name="no_orders">На данный момент заказов нет</string>
+    <string name="no_histories">На данный момент истории нет</string>
+    <string name="histories">Истории</string>
+    <string name="successfully_finished">Завершено успешно</string>
+    <string name="submit_order">Потверждение заказа</string>
+    <string name="select_one_for_add_image">Нажмите один из них, чтобы добавить изображение</string>
+    <string name="title">Заголовок:</string>
+    <string name="location">Адрес:</string>
+    <string name="phone_number">Номер клиента:</string>
+    <string name="name">Имя клиента:</string>
+    <string name="submit_order_btn">Подтвердить заказа</string>
+    <string name="in_your_phone_hasnt_camera">В вашем телефоне нет камеры</string>
+    <string name="camera_not_permitted">Нет разрешения на камеру</string>
+    <string name="are_you_sure_you_want_to_confirm_your_order">Вы точно хотите подтвердить заказ?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="photography">Фотография</string>
+    <string name="viberite_neskolko">Выберите несколько</string>
+    <string name="delete">Удалить</string>
+    <string name="sign_in">Войти</string>
+    <string name="phone_number_til">Телефон номер</string>
+    <string name="password">Пароль</string>
+    <string name="history_order">История заказа</string>
+    <string name="no_photos">Нет фотографий</string>
+    <string name="the_number_of_photos_should_not_exceed_ten">Количество фото не должно превышать 10 штук</string>
+    <string name="choose_photo_for_delete">Выберите фотографии для удаления</string>
 </resources>

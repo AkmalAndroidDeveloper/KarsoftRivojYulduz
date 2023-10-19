@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/signInFragment">
+
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.karsoftrivojyulduz.presentation.ui.orders.OrdersFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_orders" >
+        <action
+            android:id="@+id/action_mainFragment_to_historyFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"
+            app:destination="@id/historyFragment" />
+        <action
+            android:id="@+id/action_mainFragment_to_orderFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"
+            app:destination="@id/orderFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/historyFragment"
+        android:name="com.example.karsoftrivojyulduz.presentation.ui.histories.HistoriesFragment"
+        android:label="fragment_history"
+        tools:layout="@layout/fragment_histories" >
+        <action
+            android:id="@+id/action_historyFragment_to_orderFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"
+            app:destination="@id/orderFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/orderFragment"
+        android:name="com.example.karsoftrivojyulduz.presentation.ui.submitorder.SumbitOrderFragment"
+        android:label="fragment_order"
+        tools:layout="@layout/fragment_submit_order" >
+        <argument
+            android:name="orderId"
+            app:argType="integer" />
+        <action
+            android:id="@+id/action_orderFragment_to_orderImageFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"
+            app:destination="@id/orderImageFragment" />
+        <argument
+            android:name="fromHistoryFragment"
+            app:argType="boolean" />
+    </fragment>
+    <fragment
+        android:id="@+id/orderImageFragment"
+        android:name="com.example.karsoftrivojyulduz.presentation.ui.orderimage.OrderImageFragment"
+        android:label="fragment_order_image"
+        tools:layout="@layout/fragment_order_image" >
+        <argument
+            android:name="image"
+            app:argType="string" />
+        <argument
+            android:name="position"
+            app:argType="integer" />
+        <argument
+            android:name="fromHistoryFragment"
+            app:argType="boolean" />
+    </fragment>
+    <fragment
+        android:id="@+id/signInFragment"
+        android:name="com.example.karsoftrivojyulduz.presentation.ui.signin.SignInFragment"
+        android:label="fragment_sign_in"
+        tools:layout="@layout/fragment_sign_in" >
+        <action
+            android:id="@+id/action_signInFragment_to_mainFragment"
+            app:popUpTo="@id/signInFragment"
+            app:enterAnim="@anim/slide_in"
+            app:exitAnim="@anim/fade_out"
+            app:popEnterAnim="@anim/fade_in"
+            app:popExitAnim="@anim/slide_out"
+            app:popUpToInclusive="true"
+            app:destination="@id/mainFragment" />
+    </fragment>
+</navigation>
