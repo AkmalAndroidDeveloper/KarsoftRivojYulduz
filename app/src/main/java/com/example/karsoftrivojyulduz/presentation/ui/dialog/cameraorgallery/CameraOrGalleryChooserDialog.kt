@@ -1,4 +1,4 @@
-package com.example.karsoftrivojyulduz.presentation.ui.dialog.cameraorgallerychooser
+package com.example.karsoftrivojyulduz.presentation.ui.dialog.cameraorgallery
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -6,11 +6,11 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import com.example.karsoftrivojyulduz.R
-import com.example.karsoftrivojyulduz.databinding.DialogCameraOrGalleryChooserBinding
+import com.example.karsoftrivojyulduz.databinding.DialogCameraOrGalleryBinding
 
-class CameraOrGalleryChooserDialog : DialogFragment(R.layout.dialog_camera_or_gallery_chooser) {
+class CameraOrGalleryChooserDialog : DialogFragment(R.layout.dialog_camera_or_gallery) {
 
-    private var _binding: DialogCameraOrGalleryChooserBinding? = null
+    private var _binding: DialogCameraOrGalleryBinding? = null
     private var onCameraClick: ((View) -> Unit)? = null
     private var onGalleryClick: ((View) -> Unit)? = null
 
@@ -25,7 +25,7 @@ class CameraOrGalleryChooserDialog : DialogFragment(R.layout.dialog_camera_or_ga
     }
 
     private fun bindView(view: View) {
-        _binding = DialogCameraOrGalleryChooserBinding.bind(view)
+        _binding = DialogCameraOrGalleryBinding.bind(view)
     }
 
     private fun unBindView() {

@@ -2,7 +2,7 @@ package com.example.karsoftrivojyulduz.di
 
 import com.example.karsoftrivojyulduz.presentation.ui.viewmodel.OrdersAndHistoriesViewModel
 import com.example.karsoftrivojyulduz.presentation.ui.signin.viewmodel.SignInViewModel
-import com.example.karsoftrivojyulduz.presentation.ui.submitorder.viewmodel.SimpleOrderViewModel
+import com.example.karsoftrivojyulduz.presentation.ui.submitorder.viewmodel.SubmitOrderImagesCachingViewModel
 import com.example.karsoftrivojyulduz.presentation.ui.submitorder.viewmodel.SubmitOrderViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -15,9 +15,12 @@ val appModule = module {
         OrdersAndHistoriesViewModel(ordersRepositoryImpl = get())
     }
     viewModel {
-        SubmitOrderViewModel(orderImagesRepositoryImpl = get())
+        SubmitOrderViewModel(
+            orderImagesRepositoryImpl = get(),
+            simpleOrderRepositoryImpl = get()
+        )
     }
     viewModel {
-        SimpleOrderViewModel(simpleOrderRepositoryImpl = get())
+        SubmitOrderImagesCachingViewModel(submitOrderImagesRepositoryImpl = get())
     }
 }

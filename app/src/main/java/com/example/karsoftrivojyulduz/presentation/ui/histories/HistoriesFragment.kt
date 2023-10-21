@@ -10,12 +10,12 @@ import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.karsoftrivojyulduz.R
 import com.example.karsoftrivojyulduz.databinding.FragmentHistoriesBinding
-import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.Data
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderAndHistoryResponseData
 import com.example.karsoftrivojyulduz.presentation.ui.histories.adapter.HistoriesAdapter
-import com.example.karsoftrivojyulduz.presentation.ui.orders.OrdersFragmentDirections
 import com.example.karsoftrivojyulduz.presentation.ui.viewmodel.OrdersAndHistoriesViewModel
-import com.example.karsoftrivojyulduz.util.Constants
+import com.example.karsoftrivojyulduz.util.constant.Constants
+import com.example.karsoftrivojyulduz.util.extension.toastMessage
+import com.example.karsoftrivojyulduz.util.local.LocalStorage
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -38,12 +38,18 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
 
-        binding.swipeRefreshLayout.isRefreshing = true
-
+        turnOnSwipeRefreshEffect()
         initHistoriesAdapter()
         initObservables()
         initListeners()
-        getAllData()
+    }
+
+    private fun turnOnSwipeRefreshEffect() {
+        binding.swipeRefreshLayout.isRefreshing = true
+    }
+
+    private fun turnOffSwipeRefreshEffect() {
+        binding.swipeRefreshLayout.isRefreshing = false
     }
 
     private fun setUpRecyclerViewLayoutManager() {
@@ -58,18 +64,19 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
     private fun initObservables() {
         with(ordersViewModel) {
             successFlow.onEach {
-                binding.swipeRefreshLayout.isRefreshing = false
+                turnOffSwipeRefreshEffect()
                 initListHistoriesAdapter(it.data)
                 checkAndChangeVisibilityWhenOrderListIsEmpty(it.data)
                 setUpRecyclerViewLayoutManager()
                 setUpRecyclerViewAdapter()
             }.launchIn(lifecycleScope)
             messageFlow.onEach {
-                binding.swipeRefreshLayout.isRefreshing = false
+                turnOffSwipeRefreshEffect()
+                toastMessage(it)
                 Log.d(TAG, "MessageFlow: $it")
             }.launchIn(lifecycleScope)
             errorFlow.onEach {
-                binding.swipeRefreshLayout.isRefreshing = false
+                turnOffSwipeRefreshEffect()
                 Log.d(TAG, "ErrorFlow: $it")
             }.launchIn(lifecycleScope)
         }
@@ -133,8 +140,14 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        getAllData()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         unBindView()
+        LocalStorage().fromOrdersFragment = false
     }
 }

@@ -5,7 +5,7 @@ import com.example.karsoftrivojyulduz.data.repository.SignInRepositoryImpl
 import com.example.karsoftrivojyulduz.domain.model.signin.SignInRequestData
 import com.example.karsoftrivojyulduz.domain.model.signin.SignInResponseData
 import com.example.karsoftrivojyulduz.domain.usecase.impl.SignInUseCaseImpl
-import com.example.karsoftrivojyulduz.util.JSONObjectConvertor
+import com.example.karsoftrivojyulduz.util.convertor.JSONObjectConvertor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch

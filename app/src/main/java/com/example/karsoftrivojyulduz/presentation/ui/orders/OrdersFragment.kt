@@ -11,13 +11,14 @@ import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.karsoftrivojyulduz.R
-import com.example.karsoftrivojyulduz.presentation.ui.orders.adapter.OrdersAdapter
 import com.example.karsoftrivojyulduz.databinding.FragmentOrdersBinding
-import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.Data
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderAndHistoryResponseData
+import com.example.karsoftrivojyulduz.presentation.ui.dialog.logout.LogOutDialog
+import com.example.karsoftrivojyulduz.presentation.ui.orders.adapter.OrdersAdapter
 import com.example.karsoftrivojyulduz.presentation.ui.viewmodel.OrdersAndHistoriesViewModel
-import com.example.karsoftrivojyulduz.util.Constants
-import com.example.karsoftrivojyulduz.util.toastMessage
+import com.example.karsoftrivojyulduz.util.constant.Constants
+import com.example.karsoftrivojyulduz.util.extension.toastMessage
+import com.example.karsoftrivojyulduz.util.local.LocalStorage
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -26,6 +27,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class OrdersFragment : Fragment(R.layout.fragment_orders) {
 
     private lateinit var ordersAdapter: OrdersAdapter
+    private lateinit var logOutDialog: LogOutDialog
 
     private var _binding: FragmentOrdersBinding? = null
 
@@ -40,40 +42,49 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
 
-        binding.swipeRefreshLayout.isRefreshing = true
-
-        changeSystemBarsAndIconsColor()
+//        changeSystemBarsAndIconsColor()
         initOrdersAdapter()
+        initLogOutDialog()
         initObservables()
         initListeners()
-        getAllData()
+    }
+
+    private fun initLogOutDialog() {
+        logOutDialog = LogOutDialog()
+    }
+
+    private fun turnOnSwipeRefreshEffect() {
+        binding.swipeRefreshLayout.isRefreshing = true
     }
 
     private fun initObservables() {
         with(ordersViewModel) {
             successFlow.onEach {
-                binding.swipeRefreshLayout.isRefreshing = false
+                turnOffSwipeRefreshEffect()
                 initAdapterList(it.data)
                 checkAndChangeVisibilityWhenOrderListIsEmpty(it.data)
                 setUpRecyclerViewLayoutManager()
                 setUpRecyclerViewAdapter()
             }.launchIn(lifecycleScope)
             messageFlow.onEach {
-                binding.swipeRefreshLayout.isRefreshing = false
+                turnOffSwipeRefreshEffect()
+                toastMessage(it)
                 Log.d(TAG, "MessageFlow: $it")
             }.launchIn(lifecycleScope)
             errorFlow.onEach {
-                binding.swipeRefreshLayout.isRefreshing = false
+                turnOffSwipeRefreshEffect()
                 Log.d(TAG, "ErrorFlow: $it")
             }.launchIn(lifecycleScope)
         }
     }
 
+    private fun turnOffSwipeRefreshEffect() {
+        binding.swipeRefreshLayout.isRefreshing = false
+    }
+
     private fun setUpRecyclerViewLayoutManager() {
         val layoutManager = LinearLayoutManager(
-            requireContext(),
-            LinearLayoutManager.VERTICAL,
-            false
+            requireContext(), LinearLayoutManager.VERTICAL, false
         )
 
         binding.recyclerViewOrders.layoutManager = layoutManager
@@ -110,18 +121,37 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         binding.recyclerViewOrders.adapter = ordersAdapter
     }
 
+    private fun showLogOutDialog() {
+        logOutDialog.show(childFragmentManager, null)
+    }
+
+    private fun dismissLogOutDialog() {
+        logOutDialog.dismiss()
+    }
+
     private fun initListeners() {
         with(binding) {
             ivHistory.setOnClickListener {
                 navigateTo(R.id.action_mainFragment_to_historyFragment)
             }
+            ivLogOut.setOnClickListener {
+                showLogOutDialog()
+            }
             ordersAdapter.setOnItemClickListener { order, orderId ->
-                val direction =
-                    OrdersFragmentDirections.actionMainFragmentToOrderFragment(orderId, false)
+                val direction = OrdersFragmentDirections.actionMainFragmentToOrderFragment(
+                    orderId, false
+                )
                 navigateTo(direction)
             }
             swipeRefreshLayout.setOnRefreshListener {
                 getAllData()
+            }
+            logOutDialog.onYesButtonClickListener {
+                LocalStorage().fromOrdersFragment = true
+                navigateTo(R.id.signInFragment)
+            }
+            logOutDialog.onNoButtonClickListener {
+                dismissLogOutDialog()
             }
         }
     }
@@ -147,9 +177,16 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     }
 
     private fun getAllData() {
+        turnOnSwipeRefreshEffect()
+        
         lifecycleScope.launch {
             ordersViewModel.getAllOrders(Constants.ORDER_STATUS_PROCESS)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        getAllData()
     }
 
     override fun onDestroyView() {

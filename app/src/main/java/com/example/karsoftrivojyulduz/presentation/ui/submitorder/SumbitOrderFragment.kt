@@ -17,6 +17,7 @@ import android.provider.MediaStore.Images
 import android.provider.Settings
 import android.util.Log
 import android.view.View
+import androidx.activity.result.ActivityResult
 import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.RequiresApi
@@ -33,15 +34,19 @@ import com.example.karsoftrivojyulduz.R
 import com.example.karsoftrivojyulduz.databinding.FragmentSubmitOrderBinding
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.Image
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderImagesRequestData
-import com.example.karsoftrivojyulduz.presentation.ui.dialog.cameraorgallerychooser.CameraOrGalleryChooserDialog
+import com.example.karsoftrivojyulduz.domain.model.submitOrder.SubmitImagesCacheData
+import com.example.karsoftrivojyulduz.domain.model.submitOrder.SubmitImagesData
+import com.example.karsoftrivojyulduz.presentation.ui.dialog.cameraorgallery.CameraOrGalleryChooserDialog
 import com.example.karsoftrivojyulduz.presentation.ui.dialog.loading.LoadingDialog
 import com.example.karsoftrivojyulduz.presentation.ui.dialog.submitorder.SubmitOrderDialog
 import com.example.karsoftrivojyulduz.presentation.ui.submitorder.adapter.HistoryImagesAdapter
 import com.example.karsoftrivojyulduz.presentation.ui.submitorder.adapter.SubmitOrderImagesAdapter
-import com.example.karsoftrivojyulduz.presentation.ui.submitorder.viewmodel.SimpleOrderViewModel
+import com.example.karsoftrivojyulduz.presentation.ui.submitorder.viewmodel.SubmitOrderImagesCachingViewModel
 import com.example.karsoftrivojyulduz.presentation.ui.submitorder.viewmodel.SubmitOrderViewModel
-import com.example.karsoftrivojyulduz.util.Constants
-import com.example.karsoftrivojyulduz.util.toastMessage
+import com.example.karsoftrivojyulduz.util.constant.Constants
+import com.example.karsoftrivojyulduz.util.convertor.ImageConvertor
+import com.example.karsoftrivojyulduz.util.extension.toastMessage
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -64,8 +69,7 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
     private lateinit var cameraOrGalleryChooserDialog: CameraOrGalleryChooserDialog
     private lateinit var submitOrderDialog: SubmitOrderDialog
     private lateinit var loadingDialog: LoadingDialog
-
-    private lateinit var listOfImagesFromCameraAndGallery: MutableList<Bitmap>
+    private lateinit var listOfImagesFromCameraAndGallery: MutableList<SubmitImagesData>
     private lateinit var listOfImageUrisFromCameraAndGallery: MutableList<Uri>
     private lateinit var listOfSelectedImageForDelete: MutableMap<Int, String>
 
@@ -75,12 +79,13 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
     private var fromHistoryFramgnet = false
     private var currentImagePathFromCamera: String? = null
     private var orderId: Int = Constants.UNDEFINED_ID
-    private var imageOrderId: Int = Constants.UNDEFINED_ID
+    private var imageOrderId: Int = 0
+    private var imageId: Int = 0
 
     private val binding get() = _binding!!
     private val arguments: SumbitOrderFragmentArgs by navArgs()
-    private val simpleOrderViewModel by viewModel<SimpleOrderViewModel>()
     private val submitOrderViewModel by viewModel<SubmitOrderViewModel>()
+    private val submitOrderImagesCachingViewModel by viewModel<SubmitOrderImagesCachingViewModel>()
 
     companion object {
         private const val TAG = "SumbitOrderFragment"
@@ -99,7 +104,7 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
         initLists()
         initAdapters()
         initDialogs()
-        getCustomerData()
+        getData()
         updateUI(fromHistoryFramgnet)
         initObservables(fromHistoryFramgnet)
         initListeners()
@@ -122,6 +127,7 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
             if (fromHistoryFramgnet) {
                 tvToolbar.text = getString(R.string.history_order)
                 ivAddImage.visibility = View.INVISIBLE
+                noPhotosContainer.visibility = View.INVISIBLE
                 btnSumbitOrDeleteOrder.visibility = View.GONE
             } else {
                 tvToolbar.text = getString(R.string.submit_order)
@@ -140,11 +146,16 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
         }
     }
 
-    private fun getCustomerData() {
-        loadingDialog.show(childFragmentManager, null)
-
-        lifecycleScope.launch {
-            simpleOrderViewModel.getSimpleOrder(orderId)
+    private fun getData() {
+        showLoadingDialog()
+        if (!fromHistoryFramgnet) {
+            lifecycleScope.launch {
+                submitOrderImagesCachingViewModel.getAllImages(orderId)
+            }
+        } else {
+            lifecycleScope.launch {
+                submitOrderViewModel.getSimpleOrder(orderId)
+            }
         }
     }
 
@@ -158,41 +169,23 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
     private fun initValues() {
         orderId = arguments.orderId
         fromHistoryFramgnet = arguments.fromHistoryFragment
-        imageOrderId = 0
     }
 
     private fun initRegistersForActivityResult() {
         cameraRequestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()
         ) { isGranted ->
-            if (isGranted) openCamera("order_${orderId}_${++imageOrderId}")
+            if (isGranted) openCamera("order_${orderId}_${imageOrderId}")
             else requestCameraPermission()
         }
         cameraResultLauncher = registerForActivityResult(
             ActivityResultContracts.StartActivityForResult()
         ) {
-            if (it.resultCode == Activity.RESULT_OK) lifecycleScope.launch {
-                try {
-                    fromCamera = true
-                    val bitmap = BitmapFactory.decodeFile(currentImagePathFromCamera)
-
-                    if (listOfImagesFromCameraAndGallery.size > 10) {
-                        toastMessage(getString(R.string.the_number_of_photos_should_not_exceed_ten))
-                    } else {
-                        saveImage(bitmap, "order_${orderId}_${imageOrderId}")
-                        listOfImagesFromCameraAndGallery.add(bitmap)
-                        listOfImageUrisFromCameraAndGallery.add(
-                            getImageUri(requireContext(), bitmap) ?: Uri.parse("")
-                        )
-                        submitOrderImagesAdapter.addImage(bitmap, imageOrderId)
-                    }
-                    if (listOfImagesFromCameraAndGallery.isNotEmpty()) {
-                        binding.recyclerViewImages.visibility = View.VISIBLE
-                        binding.noPhotosContainer.visibility = View.INVISIBLE
-                    }
-                } catch (e: Exception) {
-                    e.printStackTrace()
-                }
+            if (it.resultCode == Activity.RESULT_OK)
+                lifecycleScope.launch {
+                fromCamera = true
+                fetchImageFromCamera(it)
+                checkAndChangeVisibilityIfListOfImagesFromCameraAndGalleryIsNotEmpty()
             }
         }
         galleryRequestPermissionLauncher = registerForActivityResult(
@@ -206,57 +199,87 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
         ) {
             if (it.resultCode == Activity.RESULT_OK) {
                 lifecycleScope.launch {
-
                     fromCamera = false
-                    if (it.data?.clipData != null) {
-                        var countImages = it.data?.clipData?.itemCount
-
-                        if ((countImages?.plus(listOfImagesFromCameraAndGallery.size))!! <= 10) {
-                            for (i in 0 until countImages) {
-                                ++imageOrderId
-
-                                val imageUri = it.data?.clipData?.getItemAt(i)?.uri
-                                val bitmap = Images.Media.getBitmap(
-                                    requireContext().contentResolver, imageUri
-                                )
-
-                                if (listOfImagesFromCameraAndGallery.size > 10) {
-                                    toastMessage(getString(R.string.the_number_of_photos_should_not_exceed_ten))
-                                } else {
-                                    listOfImageUrisFromCameraAndGallery.add(
-                                        imageUri ?: Uri.parse("")
-                                    )
-                                    listOfImagesFromCameraAndGallery.add(bitmap)
-                                    submitOrderImagesAdapter.addImage(bitmap, imageOrderId)
-                                }
-                            }
-                        } else {
-                            toastMessage(getString(R.string.the_number_of_photos_should_not_exceed_ten))
-                        }
-                    } else if (it.data?.data != null) {
-                        ++imageOrderId
-
-                        var imageUri = it.data?.data
-                        val bitmap = Images.Media.getBitmap(
-                            requireContext().contentResolver, imageUri
-                        )
-                        toastMessage("${listOfImagesFromCameraAndGallery.size}")
-                        if (listOfImagesFromCameraAndGallery.size > 10) {
-                            toastMessage(getString(R.string.the_number_of_photos_should_not_exceed_ten))
-                        } else {
-                            listOfImageUrisFromCameraAndGallery.add(imageUri ?: Uri.parse(""))
-                            listOfImagesFromCameraAndGallery.add(bitmap) // for count, not for adapter
-                            submitOrderImagesAdapter.addImage(bitmap, imageOrderId)
-                        }
-                    }
-                    if (listOfImagesFromCameraAndGallery.isNotEmpty()) {
-                        binding.recyclerViewImages.visibility = View.VISIBLE
-                        binding.noPhotosContainer.visibility = View.INVISIBLE
-                    }
+                    fetctSelectedImagesFromGallery(it)
+                    checkAndChangeVisibilityIfListOfImagesFromCameraAndGalleryIsNotEmpty()
+                    if (!fromHistoryFramgnet)
+                        cachingOrderImages()
                 }
             }
         }
     }
+
+    private fun fetchImageFromCamera(activityResult: ActivityResult) {
+        val bitmap = BitmapFactory.decodeFile(currentImagePathFromCamera)
+
+        if (hasListOfImagesFromCameraAndGalleryLengthMoreThanTen()) toastMessage(getString(R.string.the_number_of_photos_should_not_exceed_ten))
+        else {
+            incrementImageOrderId()
+
+            val imageData = SubmitImagesData(imageId, orderId, bitmap)
+
+            listOfImageUrisFromCameraAndGallery.add(
+                getImageUri(requireContext(), bitmap) ?: Uri.parse("")
+            )
+            listOfImagesFromCameraAndGallery.add(imageData)
+            addImageToSubmitOrderImagesAdapterList(imageData)
+            saveImage(bitmap, "order_${orderId}_$imageOrderId")
+        }
+    }
+
+    private fun fetctSelectedImagesFromGallery(it: ActivityResult?) {
+        if (it?.data?.clipData != null) {
+            val countImages = it.data?.clipData?.itemCount
+
+            if ((countImages?.plus(listOfImagesFromCameraAndGallery.size))!! <= 10)
+                for (i in 0 until countImages) {
+
+                    val imageUri = it.data?.clipData?.getItemAt(i)?.uri
+                    val bitmap = Images.Media.getBitmap(requireContext().contentResolver, imageUri)
+
+                    if (hasListOfImagesFromCameraAndGalleryLengthMoreThanTen())
+                        toastMessage(
+                            getString(R.string.the_number_of_photos_should_not_exceed_ten)
+                        )
+                    else {
+                        incrementImageOrderId()
+
+                        val imageData = SubmitImagesData(imageId, orderId, bitmap)
+
+                        listOfImageUrisFromCameraAndGallery.add(imageUri ?: Uri.parse(""))
+                        listOfImagesFromCameraAndGallery.add(imageData)
+                        addImageToSubmitOrderImagesAdapterList(imageData)
+                    }
+                }
+            else toastMessage(getString(R.string.the_number_of_photos_should_not_exceed_ten))
+
+        } else if (it?.data?.data != null) {
+            val imageUri = it.data?.data
+            val bitmap = Images.Media.getBitmap(requireContext().contentResolver, imageUri)
+
+            if (hasListOfImagesFromCameraAndGalleryLengthMoreThanTen()) {
+                toastMessage(getString(R.string.the_number_of_photos_should_not_exceed_ten))
+            } else {
+                incrementImageOrderId()
+
+                val imageData = SubmitImagesData(imageId, orderId, bitmap)
+
+                listOfImageUrisFromCameraAndGallery.add(imageUri ?: Uri.parse(""))
+                listOfImagesFromCameraAndGallery.add(imageData)
+                addImageToSubmitOrderImagesAdapterList(imageData)
+            }
+        }
+    }
+
+    private fun checkAndChangeVisibilityIfListOfImagesFromCameraAndGalleryIsNotEmpty() {
+        if (listOfImagesFromCameraAndGallery.isNotEmpty()) {
+            binding.recyclerViewImages.visibility = View.VISIBLE
+            binding.noPhotosContainer.visibility = View.INVISIBLE
+        }
+    }
+
+    private fun hasListOfImagesFromCameraAndGalleryLengthMoreThanTen() =
+        listOfImagesFromCameraAndGallery.size > 10
 
     private fun requestGalleryPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
@@ -268,7 +291,7 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
                 requestManageExternalStoragePermission()
             }
         } else {
-            if(!hasReadExternalStoragePermission()) {
+            if (!hasReadExternalStoragePermission()) {
                 requestReadExternalStoragePermission()
             }
         }
@@ -302,45 +325,84 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
     }
 
     private fun initObservables(fromHistoryFramgnet: Boolean) {
-        with(simpleOrderViewModel) {
-            successFlow.onEach {
-                loadingDialog.dismiss()
+        if (!fromHistoryFramgnet)
+            with(submitOrderImagesCachingViewModel) {
+                successSubmitOrderImagesFlow.onEach {
+                    dismissLoadingDialog()
+                    if (it.isNotEmpty()) {
+                        binding.noPhotosContainer.visibility = View.INVISIBLE
+                        binding.recyclerViewImages.visibility = View.VISIBLE
 
-                with(binding) {
-                    tvTitle.text = it.data.contact.title.toString()
-                    tvLocation.text = it.data.contact.address.toString()
-                    tvCustomerName.text = it.data.contact.name
-                    tvCustomerPhoneNumber.text = it.data.contact.phone
+                        for (data in it) {
+                            val id = data.id ?: Constants.UNDEFINED_ID
+                            val orderId = data.orderId
+                            val path = Uri.parse(data.path)
+                            val bitmap = ImageConvertor().stringToBitmap(data.image)
+                            val submitImagesData = SubmitImagesData(id, orderId, bitmap!!)
 
-                    if (fromHistoryFramgnet) initHistoryImagesAdapterList(it.data.images)
+                            listOfImagesFromCameraAndGallery.add(submitImagesData)
+                            listOfImageUrisFromCameraAndGallery.add(path)
 
-                    setUpRecyclerViewLayoutManager()
-                    setUpRecyclerViewAdapter(fromHistoryFramgnet)
-                }
-            }.launchIn(lifecycleScope)
-            messageFlow.onEach {
-                Log.d(TAG, "Message: $it")
-            }.launchIn(lifecycleScope)
-            errorFlow.onEach {
-                Log.d(TAG, "Error: $it")
-            }.launchIn(lifecycleScope)
-        }
-        with(submitOrderViewModel) {
-            successFlow.onEach {
-                Log.d(TAG, "Success: ${it.message}")
-                loadingDialog.dismiss()
-                findNavController().popBackStack()
-            }.launchIn(lifecycleScope)
-            messageFlow.onEach {
-                Log.d(TAG, "Message: $it")
-                loadingDialog.dismiss()
-            }.launchIn(lifecycleScope)
-            errorFlow.onEach {
-                Log.d(TAG, "Error: $it")
-                loadingDialog.dismiss()
-                popBackStack()
-            }.launchIn(lifecycleScope)
-        }
+                            addImageToSubmitOrderImagesAdapterList(submitImagesData)
+                            setUpRecyclerViewLayoutManager()
+                            setUpRecyclerViewAdapter(fromHistoryFramgnet)
+                        }
+                    } else {
+                        binding.noPhotosContainer.visibility = View.VISIBLE
+                        binding.recyclerViewImages.visibility = View.INVISIBLE
+
+                    }
+                }.launchIn(lifecycleScope)
+            }
+        else
+            with(submitOrderViewModel) {
+                successSimpleOrderFlow.onEach {
+                    toastMessage("success")
+                    dismissLoadingDialog()
+                    with(binding) {
+                        tvTitle.text = it.data.contact.title.toString()
+                        tvLocation.text = it.data.contact.address.toString()
+                        tvCustomerName.text = it.data.contact.name
+                        tvCustomerPhoneNumber.text = it.data.contact.phone
+
+                        if (fromHistoryFramgnet) initHistoryImagesAdapterList(it.data.images)
+
+                        setUpRecyclerViewLayoutManager()
+                        setUpRecyclerViewAdapter(fromHistoryFramgnet)
+                    }
+                }.launchIn(lifecycleScope)
+                messageSimpleOrderFlow.onEach {
+                    toastMessage("message")
+                    Log.d(TAG, "Message: $it")
+                }.launchIn(lifecycleScope)
+                errorSimpleOrderFlow.onEach {
+                    toastMessage("error")
+                    Log.d(TAG, "Error: $it")
+                }.launchIn(lifecycleScope)
+
+                successOrderImagesFlow.onEach {
+                    Log.d(TAG, "Success: ${it.message}")
+                    dismissLoadingDialog()
+                    findNavController().popBackStack()
+                }.launchIn(lifecycleScope)
+                messageOrderImagesFlow.onEach {
+                    Log.d(TAG, "Message: $it")
+                    dismissLoadingDialog()
+                }.launchIn(lifecycleScope)
+                errorOrderImagesFlow.onEach {
+                    Log.d(TAG, "Error: $it")
+                    dismissLoadingDialog()
+                    popBackStack()
+                }.launchIn(lifecycleScope)
+            }
+    }
+
+    private fun dismissLoadingDialog() {
+        loadingDialog.dismiss()
+    }
+
+    private fun addImageToSubmitOrderImagesAdapterList(imageData: SubmitImagesData) {
+        submitOrderImagesAdapter.addImage(imageData)
     }
 
     private fun initListeners() {
@@ -367,7 +429,6 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
                         for (i in listOfSelectedImageForDelete.keys) {
                             listOfImageUrisFromCameraAndGallery.removeAt(i)
                             listOfImagesFromCameraAndGallery.removeAt(i)
-                            submitOrderImagesAdapter.removeImage(i)
                         }
                         hasImagesSelectable = false
                         ivAddImage.visibility = View.VISIBLE
@@ -403,7 +464,7 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
                             )
                         )
                     }
-                    loadingDialog.show(childFragmentManager, null)
+                    showLoadingDialog()
                 }
             }
             submitOrderImagesAdapter.setOnItemClickListener { image, imagePosition, cardSelect ->
@@ -426,7 +487,7 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
                 } else {
                     val direction =
                         SumbitOrderFragmentDirections.actionOrderFragmentToOrderImageFragment(
-                            getImageUri(requireContext(), image).toString(),
+                            getImageUri(requireContext(), image.image).toString(),
                             imagePosition,
                             fromHistoryFramgnet
                         )
@@ -454,6 +515,10 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
         }
     }
 
+    private fun showLoadingDialog() {
+        loadingDialog.show(childFragmentManager, null)
+    }
+
     private fun checkAndOpenGallery() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             if (hasReadMediaImagesPermission()) {
@@ -467,9 +532,9 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
             } else {
                 requestManageExternalStoragePermission()
             }
-        }else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
-            if(hasReadExternalStoragePermission()) {
-               openGallery()
+        } else if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.Q) {
+            if (hasReadExternalStoragePermission()) {
+                openGallery()
             } else {
                 requestReadExternalStoragePermission()
             }
@@ -477,15 +542,15 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
     }
 
     private fun checkAndOpenCamera() {
-        if (checkCameraHardware(requireContext())) {
-            if (hasCameraPermission()) {
-                openCamera("order_${orderId}_${++imageOrderId}")
-            } else {
-                requestCameraPermission()
-            }
+        if (hasCameraPermission()) {
+            openCamera("order_${orderId}_${incrementImageOrderId()}")
         } else {
-            toastMessage(getString(R.string.in_your_phone_hasnt_camera))
+            requestCameraPermission()
         }
+    }
+
+    private fun incrementImageOrderId() {
+        ++imageOrderId
     }
 
     private fun popBackStack() {
@@ -568,6 +633,7 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
 
     private fun openGallery() {
         var intent = Intent(Intent.ACTION_OPEN_DOCUMENT)
+        intent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         intent.putExtra(Intent.EXTRA_ALLOW_MULTIPLE, true)
         intent.addCategory(Intent.CATEGORY_OPENABLE)
         intent.type = "image/*"
@@ -575,17 +641,17 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
     }
 
     private fun openCamera(fileName: String) {
-        val cameraIntent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val storageDirectory =
-            requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
+
+        val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
+        val storageDirectory = requireContext().getExternalFilesDir(Environment.DIRECTORY_PICTURES)
         val imageFile = File.createTempFile(fileName, Constants.JPG, storageDirectory)
         try {
             currentImagePathFromCamera = imageFile.absolutePath
             val imageUri = FileProvider.getUriForFile(
                 requireContext(), Constants.AUTHORITY, imageFile
             )
-            cameraIntent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
-            cameraResultLauncher.launch(cameraIntent)
+            intent.putExtra(MediaStore.EXTRA_OUTPUT, imageUri)
+            cameraResultLauncher.launch(intent)
         } catch (e: Exception) {
             e.printStackTrace()
         }
@@ -612,9 +678,27 @@ class SumbitOrderFragment : Fragment(R.layout.fragment_submit_order) {
         }
     }
 
+    private fun cachingOrderImages() {
+        lifecycleScope.launch {
+            for (i in listOfImagesFromCameraAndGallery.indices) {
+                val bitmapString = ImageConvertor().bitmapToString(listOfImagesFromCameraAndGallery[i].image) ?: ""
+                val path = listOfImageUrisFromCameraAndGallery[i].toString()
+                val submitOrderCacheData = SubmitImagesCacheData(orderId = orderId, image = bitmapString, path = path)
+                submitOrderImagesCachingViewModel.insertImage(submitOrderCacheData)
+                Log.d(TAG, "cachingOrderImages: $submitOrderCacheData")
+            }
+        }
+    }
+
+    override fun onPause() {
+        super.onPause()
+    }
+
     override fun onDestroyView() {
         super.onDestroyView()
         unBindView()
+        listOfImagesFromCameraAndGallery.clear()
+        listOfImageUrisFromCameraAndGallery.clear()
         listOfSelectedImageForDelete.clear()
     }
 }

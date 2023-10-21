@@ -2,32 +2,36 @@ package com.example.karsoftrivojyulduz.presentation.ui.submitorder.adapter
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.graphics.Bitmap
+import android.util.Log
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
 import androidx.cardview.widget.CardView
-import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.karsoftrivojyulduz.databinding.ItemOfRecyclerViewSubmitOrderImagesBinding
+import com.example.karsoftrivojyulduz.domain.model.submitOrder.SubmitImagesData
 
 class SubmitOrderImagesAdapter(
     private val context: Context
 ) : RecyclerView.Adapter<SubmitOrderImagesAdapter.ViewHolder>() {
 
-    private var listOfImage: MutableList<Bitmap> = mutableListOf()
-    private var onClickItem: ((Bitmap, Int, CardView) -> Unit)? = null
+    private val listOfImage: MutableList<SubmitImagesData> = mutableListOf()
+    private var onClickItem: ((SubmitImagesData, Int, CardView) -> Unit)? = null
     private var onLongClickItem: ((Boolean) -> Unit)? = null
+
+    companion object {
+        private const val TAG = "SubmitOrderImagesAdapte"
+    }
 
     inner class ViewHolder(private val binding: ItemOfRecyclerViewSubmitOrderImagesBinding) :
         RecyclerView.ViewHolder(binding.root) {
         @SuppressLint("SetTextI18n")
-        fun onBind(image: Bitmap, position: Int) {
+        fun onBind(image: SubmitImagesData, position: Int) {
+            Log.d(TAG, "onBind: $image")
             with(binding) {
                 Glide
                     .with(context)
-                    .load(image)
+                    .load(image.image)
                     .centerCrop()
                     .into(ivOrderImage)
 
@@ -42,7 +46,7 @@ class SubmitOrderImagesAdapter(
         }
     }
 
-    fun setOnItemClickListener(block: ((Bitmap, Int, CardView) -> Unit)) {
+    fun setOnItemClickListener(block: ((SubmitImagesData, Int, CardView) -> Unit)) {
         onClickItem = block
     }
 
@@ -50,15 +54,9 @@ class SubmitOrderImagesAdapter(
         onLongClickItem = block
     }
 
-    fun addImage(image: Bitmap, position: Int) {
-        this.listOfImage.add(image)
-        notifyItemInserted(position)
-    }
-
-    fun removeImage(position: Int) {
-        this.listOfImage.removeAt(position)
-        notifyItemRemoved(position)
-        notifyItemRangeChanged(position, this.listOfImage.size)
+    fun addImage(imageData: SubmitImagesData) {
+        this.listOfImage.add(imageData)
+        notifyItemInserted(0)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -70,7 +68,9 @@ class SubmitOrderImagesAdapter(
         return ViewHolder(view)
     }
 
-    override fun getItemCount(): Int = listOfImage.size
+    override fun getItemCount(): Int {
+        return listOfImage.size
+    }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.onBind(listOfImage[position], position)

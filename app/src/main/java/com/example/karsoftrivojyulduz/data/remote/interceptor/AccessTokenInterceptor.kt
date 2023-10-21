@@ -1,6 +1,6 @@
 package com.example.bookie.data.remote.interceptors
 
-import com.example.karsoftrivojyulduz.util.LocalStorage
+import com.example.karsoftrivojyulduz.util.local.LocalStorage
 import okhttp3.Interceptor
 
 class AccessTokenInterceptor : Interceptor {

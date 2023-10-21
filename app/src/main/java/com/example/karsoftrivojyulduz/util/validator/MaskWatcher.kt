@@ -1,4 +1,4 @@
-package com.example.karsoftrivojyulduz.util
+package com.example.karsoftrivojyulduz.util.validator
 
 import android.content.Context
 import android.text.Editable
@@ -15,14 +15,18 @@ class MaskWatcher(
     override fun beforeTextChanged(charSequence: CharSequence, start: Int, count: Int, after: Int) {
         isDeleting = count > after
     }
-    override fun onTextChanged(charSequence: CharSequence, start: Int, before: Int, count: Int) {}
+
+    override fun onTextChanged(charSequence: CharSequence, start: Int, before: Int, count: Int) {
+
+    }
+
     override fun afterTextChanged(editable: Editable) {
-        if (isRunning || isDeleting) {
+        if (isRunning || isDeleting)
             return
-        }
+
         isRunning = true
+
         val editableLength = editable.length
-        val editableText = editable.toString()
 
         if (editableLength < mask.length) {
             if (mask[editableLength] != '#') {

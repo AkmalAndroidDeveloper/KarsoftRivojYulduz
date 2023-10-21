@@ -3,11 +3,11 @@ package com.example.karsoftrivojyulduz.presentation.ui.signin
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import androidx.navigation.NavDirections
 import androidx.navigation.fragment.findNavController
 import com.example.karsoftrivojyulduz.R
 import com.example.karsoftrivojyulduz.databinding.FragmentSignInBinding
@@ -15,10 +15,12 @@ import com.example.karsoftrivojyulduz.domain.model.signin.SignInRequestData
 import com.example.karsoftrivojyulduz.domain.model.signin.SignInResponseData
 import com.example.karsoftrivojyulduz.presentation.ui.dialog.loading.LoadingDialog
 import com.example.karsoftrivojyulduz.presentation.ui.signin.viewmodel.SignInViewModel
-import com.example.karsoftrivojyulduz.util.Constants
-import com.example.karsoftrivojyulduz.util.LocalStorage
-import com.example.karsoftrivojyulduz.util.MaskWatcher
-import com.example.karsoftrivojyulduz.util.toastMessage
+import com.example.karsoftrivojyulduz.util.constant.Constants
+import com.example.karsoftrivojyulduz.util.local.LocalStorage
+import com.example.karsoftrivojyulduz.util.validator.MaskWatcher
+import com.example.karsoftrivojyulduz.util.validator.PasswordValidator
+import com.example.karsoftrivojyulduz.util.validator.PhoneNumberValidator
+import com.example.karsoftrivojyulduz.util.extension.toastMessage
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -42,13 +44,29 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         bindView(view)
 
         changeSystemBarsAndIconsColor()
+//        requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         setUpMaskForInputPhoneNumber()
         initLoadingDialog()
         initListeners()
         initObservables()
+        setUpOnBackPressedCallback()
 
-        if (LocalStorage().isLogin)
-            navigateTo(R.id.action_signInFragment_to_mainFragment)
+        if (!LocalStorage().fromOrdersFragment)
+            if (LocalStorage().isLogin) {
+                navigateTo(R.id.action_signInFragment_to_mainFragment)
+            }
+    }
+
+    private fun setUpOnBackPressedCallback() {
+        val onBackPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finish()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner,
+            onBackPressedCallback
+        )
     }
 
     private fun initLoadingDialog() {
@@ -59,44 +77,91 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         with(signInViewModel) {
             successFlow.onEach {
                 saveUserDataToStorage(it)
-                loadingDialog.dismiss()
+                dismissLoadingDialog()
                 navigateTo(R.id.action_signInFragment_to_mainFragment)
             }.launchIn(lifecycleScope)
             messageFlow.onEach {
-                toastMessage("Номер телефона или пароль введены неверно")
+                toastMessage(it)
                 Log.d(TAG, "Message: $it")
+                dismissLoadingDialog()
             }.launchIn(lifecycleScope)
             errorFlow.onEach {
-                toastMessage("Номер телефона или пароль введены неверно")
                 Log.d(TAG, "Error: $it")
             }.launchIn(lifecycleScope)
         }
     }
 
+    private fun finish() {
+        requireActivity().finish()
+    }
+
+    private fun dismissLoadingDialog() {
+        loadingDialog.dismiss()
+    }
+
     private fun saveUserDataToStorage(it: SignInResponseData) {
         LocalStorage().token = it.data.token
+        LocalStorage().isLogin = true
     }
 
     private fun initListeners() {
         with(binding) {
             btnSignIn.setOnClickListener {
-                loadingDialog.show(childFragmentManager, null)
-                signIn()
+                val phoneNumber = "${Constants.NUMBER_PREFIX}${
+                    etPhone.text.toString().filter { it.isDigit() }.trim()
+                }"
+                val password = etPassword.text.toString().trim()
+
+                if (userInputsSuccessfullyValidated(phoneNumber, password)) {
+                    showLoadingDialog()
+                    signIn(phoneNumber, password)
+                    clearUserInputsData()
+                    disableUserInputsErrors()
+
+                    LocalStorage().fromOrdersFragment = false
+                    tilPhone.isFocusable = false
+                    tilPassword.isFocusable = false
+                } else
+                    showUserInputErrors(phoneNumber, password)
             }
         }
     }
 
-    private fun signIn() {
+    private fun showUserInputErrors(phoneNumber: String, password: String) {
         with(binding) {
-            val phoneNumber = "${Constants.NUMBER_PREFIX}${
-                etPhone.text.toString().filter { it.isDigit() }.trim()
-            }"
-            val password = etPassword.text.toString().trim()
-            val body = SignInRequestData(phoneNumber, password)
+            if (PhoneNumberValidator(phoneNumber).hasLengthEmpty())
+                tilPhone.error = "Номер телефона не должен быть пустым"
+            else if (PhoneNumberValidator(phoneNumber).hasEnteredLessValueThanRequired())
+                tilPhone.error = "Номер телефона должен состоять из 9 символов"
+            else
+                tilPhone.isErrorEnabled = false
+            if (PasswordValidator(password).hasLengthEmpty())
+                tilPassword.error = "Пароль не должен быть пустым"
+            else if (PasswordValidator(password).hasCyrillicLetters())
+                tilPassword.error = "Пароль не должен содержать символов кириллицы"
+            else if (PasswordValidator(password).hasEnteredMoreValueThanRequired())
+                tilPassword.error = "Пароль введен больше, чем необходимо"
+            else
+                tilPassword.isErrorEnabled = false
+        }
+    }
 
-            lifecycleScope.launch {
-                signInViewModel.signIn(body)
-            }
+    private fun userInputsSuccessfullyValidated(phoneNumber: String, password: String): Boolean {
+        return !PhoneNumberValidator(phoneNumber).hasLengthEmpty() &&
+                !PhoneNumberValidator(phoneNumber).hasEnteredLessValueThanRequired() &&
+                !PasswordValidator(password).hasLengthEmpty() &&
+                !PasswordValidator(password).hasCyrillicLetters() &&
+                !PasswordValidator(password).hasEnteredMoreValueThanRequired()
+    }
+
+    private fun showLoadingDialog() {
+        loadingDialog.show(childFragmentManager, null)
+    }
+
+    private fun signIn(phoneNumber: String, password: String) {
+        val body = SignInRequestData(phoneNumber, password)
+        lifecycleScope.launch {
+            signInViewModel.signIn(body)
         }
     }
 
@@ -113,22 +178,32 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.white)
         window.navigationBarColor = ContextCompat.getColor(requireContext(), R.color.white)
 
-        with(ViewCompat.getWindowInsetsController(window.decorView)!!) {
-            isAppearanceLightNavigationBars = true
-            isAppearanceLightStatusBars = true
-        }
+//        with(ViewCompat.getWindowInsetsController(window.decorView)!!) {
+//            isAppearanceLightNavigationBars = true
+//            isAppearanceLightStatusBars = true
+//        }
     }
 
     private fun navigateTo(direction: Int) {
         findNavController().navigate(direction)
     }
 
-    private fun navigateTo(direction: NavDirections) {
-        findNavController().navigate(direction)
-    }
-
     private fun setUpMaskForInputPhoneNumber() {
         binding.etPhone.addTextChangedListener(MaskWatcher("## ###-##-##"))
+    }
+
+    private fun clearUserInputsData() {
+        with(binding) {
+            etPhone.text?.clear()
+            etPassword.text?.clear()
+        }
+    }
+
+    private fun disableUserInputsErrors() {
+        with(binding) {
+            tilPassword.isErrorEnabled = false
+            tilPhone.isErrorEnabled = false
+        }
     }
 
     override fun onDestroyView() {

@@ -1,4 +1,4 @@
-package com.example.karsoftrivojyulduz.util
+package com.example.karsoftrivojyulduz.util.local
 
 import android.content.SharedPreferences
 import androidx.core.content.edit

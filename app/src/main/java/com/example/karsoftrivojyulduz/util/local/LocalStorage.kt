@@ -1,4 +1,4 @@
-package com.example.karsoftrivojyulduz.util
+package com.example.karsoftrivojyulduz.util.local
 
 import android.content.Context
 import android.content.SharedPreferences
@@ -13,4 +13,6 @@ class LocalStorage {
     var token by StringPreference(pref)
 
     var isLogin by BooleanPreference(pref, false)
+
+    var fromOrdersFragment by BooleanPreference(pref, false)
 }

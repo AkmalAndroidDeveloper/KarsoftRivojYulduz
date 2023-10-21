@@ -232,7 +232,7 @@
                     android:layout_height="200dp"
                     android:layout_gravity="center"
                     android:layout_marginHorizontal="16dp"
-                    android:visibility="invisible">
+                    android:visibility="visible">
 
                     <LinearLayout
                         android:layout_width="match_parent"
@@ -242,14 +242,15 @@
                         android:padding="16dp">
 
                         <ImageView
-                            android:layout_width="80dp"
-                            android:layout_height="80dp"
-                            android:src="@drawable/ic_no_images"
+                            android:layout_width="40dp"
+                            android:layout_height="40dp"
+                            android:src="@drawable/ic_no_photos"
                             android:scaleType="centerCrop"
                             app:tint="@color/gray" />
 
                         <TextView
                             android:layout_width="match_parent"
+                            android:layout_marginTop="4dp"
                             android:layout_height="wrap_content"
                             android:fontFamily="@font/inter_semibold"
                             android:text="@string/no_photos"

@@ -42,6 +42,15 @@
                 app:tint="@color/white"
                 tools:ignore="ContentDescription" />
 
+            <ImageView
+                android:id="@+id/iv_log_out"
+                android:layout_width="24dp"
+                android:layout_height="24dp"
+                android:layout_marginStart="16dp"
+                android:src="@drawable/ic_logout"
+                app:tint="@color/white"
+                tools:ignore="ContentDescription" />
+
         </LinearLayout>
 
     </com.google.android.material.appbar.AppBarLayout>

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">KarsoftRivojYulduz</string>
+    <string name="app_name">RivojYulduz</string>
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="orders">Заказы</string>
@@ -22,6 +22,7 @@
     <string name="in_your_phone_hasnt_camera">В вашем телефоне нет камеры</string>
     <string name="camera_not_permitted">Нет разрешения на камеру</string>
     <string name="are_you_sure_you_want_to_confirm_your_order">Вы точно хотите подтвердить заказ?</string>
+    <string name="are_you_sure_you_want_to_log_out">Вы точно хотите выйти с аккаунта?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
     <string name="photography">Фотография</string>

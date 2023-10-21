@@ -1,4 +1,4 @@
-package com.example.karsoftrivojyulduz.util
+package com.example.karsoftrivojyulduz.util.extension
 
 import android.widget.Toast
 import androidx.fragment.app.Fragment

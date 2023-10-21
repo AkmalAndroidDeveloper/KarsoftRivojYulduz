@@ -6,6 +6,7 @@ import android.graphics.Bitmap
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.cardview.widget.CardView
 import androidx.core.view.isVisible
 import androidx.recyclerview.widget.RecyclerView
@@ -26,6 +27,7 @@ class HistoryImagesAdapter(
         @SuppressLint("SetTextI18n")
         fun onBind(image: Image, position: Int) {
             with(binding) {
+                Toast.makeText(context, "${image.image_url}", Toast.LENGTH_SHORT).show()
                 Glide
                     .with(context)
                     .load(image.image_url)

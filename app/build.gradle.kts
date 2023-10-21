@@ -2,6 +2,7 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id ("androidx.navigation.safeargs")
+    id ("kotlin-kapt")
 }
 
 android {
@@ -70,6 +71,11 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.7.1")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.1")
     implementation ("androidx.lifecycle:lifecycle-viewmodel-ktx:2.6.2")
+
+    //Room
+    implementation ("androidx.room:room-runtime:2.5.2")
+    kapt ("androidx.room:room-compiler:2.5.2")
+    implementation ("androidx.room:room-ktx:2.5.2")
 
     //Zoomage
     implementation ("com.jsibbold:zoomage:1.3.1")
