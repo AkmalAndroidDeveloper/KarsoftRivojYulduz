@@ -1,5 +1,6 @@
 package com.example.karsoftrivojyulduz.presentation.ui.orders
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -42,7 +43,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
 
-//        changeSystemBarsAndIconsColor()
+        changeSystemBarsAndIconsColor()
         initOrdersAdapter()
         initLogOutDialog()
         initObservables()
@@ -99,9 +100,11 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.blue)
         window.navigationBarColor = ContextCompat.getColor(requireContext(), R.color.white)
 
-        with(ViewCompat.getWindowInsetsController(window.decorView)!!) {
-            isAppearanceLightNavigationBars = true
-            isAppearanceLightStatusBars = false
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            with(ViewCompat.getWindowInsetsController(window.decorView)!!) {
+                isAppearanceLightNavigationBars = true
+                isAppearanceLightStatusBars = false
+            }
         }
     }
 
@@ -137,9 +140,14 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             ivLogOut.setOnClickListener {
                 showLogOutDialog()
             }
-            ordersAdapter.setOnItemClickListener { order, orderId ->
+            ordersAdapter.setOnItemClickListener { order, orderId, title, address, customerName, customerPhoneNumber ->
                 val direction = OrdersFragmentDirections.actionMainFragmentToOrderFragment(
-                    orderId, false
+                    orderId,
+                    false,
+                    title,
+                    address,
+                    customerName,
+                    customerPhoneNumber
                 )
                 navigateTo(direction)
             }
@@ -178,7 +186,6 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
 
     private fun getAllData() {
         turnOnSwipeRefreshEffect()
-        
         lifecycleScope.launch {
             ordersViewModel.getAllOrders(Constants.ORDER_STATUS_PROCESS)
         }

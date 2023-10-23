@@ -1,10 +1,11 @@
 package com.example.karsoftrivojyulduz.presentation.ui.orderimage
 
 import android.annotation.SuppressLint
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
-import android.net.Uri
 import android.os.Bundle
 import android.provider.MediaStore
+import android.util.Base64
 import android.view.View
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
@@ -13,6 +14,8 @@ import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.karsoftrivojyulduz.R
 import com.example.karsoftrivojyulduz.databinding.FragmentOrderImageBinding
+import com.example.karsoftrivojyulduz.util.extension.toastMessage
+
 
 class OrderImageFragment : Fragment(R.layout.fragment_order_image) {
 

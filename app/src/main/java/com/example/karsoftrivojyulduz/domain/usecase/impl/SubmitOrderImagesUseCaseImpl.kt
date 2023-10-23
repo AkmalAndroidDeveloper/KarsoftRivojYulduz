@@ -1,6 +1,6 @@
 package com.example.karsoftrivojyulduz.domain.usecase.impl
 
-import com.example.karsoftrivojyulduz.domain.model.submitOrder.SubmitImagesCacheData
+import com.example.karsoftrivojyulduz.domain.model.submitorder.SubmitImagesCacheData
 import com.example.karsoftrivojyulduz.domain.repository.SubmitOrderImagesRepository
 import com.example.karsoftrivojyulduz.domain.usecase.SubmitOrderImagesUseCase
 import kotlinx.coroutines.flow.flow
@@ -15,5 +15,9 @@ class SubmitOrderImagesUseCaseImpl(private val submitOrderImagesRepository: Subm
         submitOrderImagesRepository.getAllImages(orderId).collect {
             emit(it)
         }
+    }
+
+    override fun deleteImagesById(orderId: Int) {
+        submitOrderImagesRepository.deleteImagesById(orderId)
     }
 }

@@ -5,13 +5,13 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.karsoftrivojyulduz.databinding.ItemOfRecyclerViewHistoryBinding
-import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.Data
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderAndHistoryResponseData
 
 class HistoriesAdapter : RecyclerView.Adapter<HistoriesAdapter.ViewHolder>() {
 
     private var listOfHistory: List<OrderAndHistoryResponseData.Data>? = null
-    private var onItemClick: ((OrderAndHistoryResponseData.Data, Int) -> Unit)? = null
+    private var onItemClick: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String) -> Unit)? =
+        null
 
     inner class ViewHolder(private val binding: ItemOfRecyclerViewHistoryBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -24,13 +24,20 @@ class HistoriesAdapter : RecyclerView.Adapter<HistoriesAdapter.ViewHolder>() {
                 tvCustomerPhoneNumber.text = data.contact.phone
 
                 root.setOnClickListener {
-                    onItemClick?.invoke(data, data.id)
+                    onItemClick?.invoke(
+                        data,
+                        data.id,
+                        data.contact.title.toString(),
+                        data.contact.address.toString(),
+                        data.contact.name,
+                        data.contact.phone
+                    )
                 }
             }
         }
     }
 
-    fun setOnItemClickListener(block: ((OrderAndHistoryResponseData.Data, Int) -> Unit)) {
+    fun setOnItemClickListener(block: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String) -> Unit)) {
         onItemClick = block
     }
 
@@ -40,9 +47,7 @@ class HistoriesAdapter : RecyclerView.Adapter<HistoriesAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = ItemOfRecyclerViewHistoryBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
+            LayoutInflater.from(parent.context), parent, false
         )
         return ViewHolder(view)
     }

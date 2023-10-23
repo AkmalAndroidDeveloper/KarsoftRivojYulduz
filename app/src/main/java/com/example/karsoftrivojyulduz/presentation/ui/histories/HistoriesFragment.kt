@@ -38,7 +38,6 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
 
-        turnOnSwipeRefreshEffect()
         initHistoriesAdapter()
         initObservables()
         initListeners()
@@ -54,9 +53,7 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
 
     private fun setUpRecyclerViewLayoutManager() {
         val layoutManager = LinearLayoutManager(
-            requireContext(),
-            LinearLayoutManager.VERTICAL,
-            false
+            requireContext(), LinearLayoutManager.VERTICAL, false
         )
         binding.recyclerViewHistory.layoutManager = layoutManager
     }
@@ -83,6 +80,7 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
     }
 
     private fun getAllData() {
+        turnOnSwipeRefreshEffect()
         lifecycleScope.launch {
             ordersViewModel.getAllOrders(Constants.ORDER_STATUS_DONE)
         }
@@ -116,9 +114,16 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
             swipeRefreshLayout.setOnRefreshListener {
                 getAllData()
             }
-            historiesAdapter.setOnItemClickListener { order, orderId ->
+            historiesAdapter.setOnItemClickListener { order, orderId, title, address, customerName, customerPhoneNumber ->
                 val direction =
-                    HistoriesFragmentDirections.actionHistoryFragmentToOrderFragment(orderId, true)
+                    HistoriesFragmentDirections.actionHistoryFragmentToOrderFragment(
+                        orderId,
+                        true,
+                        title,
+                        address,
+                        customerName,
+                        customerPhoneNumber
+                    )
                 navigateTo(direction)
             }
         }

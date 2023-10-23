@@ -1,5 +1,6 @@
 package com.example.karsoftrivojyulduz.presentation.ui.signin
 
+import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
@@ -16,11 +17,11 @@ import com.example.karsoftrivojyulduz.domain.model.signin.SignInResponseData
 import com.example.karsoftrivojyulduz.presentation.ui.dialog.loading.LoadingDialog
 import com.example.karsoftrivojyulduz.presentation.ui.signin.viewmodel.SignInViewModel
 import com.example.karsoftrivojyulduz.util.constant.Constants
+import com.example.karsoftrivojyulduz.util.extension.toastMessage
 import com.example.karsoftrivojyulduz.util.local.LocalStorage
 import com.example.karsoftrivojyulduz.util.validator.MaskWatcher
 import com.example.karsoftrivojyulduz.util.validator.PasswordValidator
 import com.example.karsoftrivojyulduz.util.validator.PhoneNumberValidator
-import com.example.karsoftrivojyulduz.util.extension.toastMessage
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.launch
@@ -44,17 +45,15 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         bindView(view)
 
         changeSystemBarsAndIconsColor()
-//        requireActivity().window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR;
         setUpMaskForInputPhoneNumber()
         initLoadingDialog()
         initListeners()
         initObservables()
         setUpOnBackPressedCallback()
 
-        if (!LocalStorage().fromOrdersFragment)
-            if (LocalStorage().isLogin) {
-                navigateTo(R.id.action_signInFragment_to_mainFragment)
-            }
+        if (!LocalStorage().fromOrdersFragment) if (LocalStorage().isLogin) {
+            navigateTo(R.id.action_signInFragment_to_mainFragment)
+        }
     }
 
     private fun setUpOnBackPressedCallback() {
@@ -64,8 +63,7 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
             }
         }
         requireActivity().onBackPressedDispatcher.addCallback(
-            viewLifecycleOwner,
-            onBackPressedCallback
+            viewLifecycleOwner, onBackPressedCallback
         )
     }
 
@@ -121,37 +119,34 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
                     LocalStorage().fromOrdersFragment = false
                     tilPhone.isFocusable = false
                     tilPassword.isFocusable = false
-                } else
-                    showUserInputErrors(phoneNumber, password)
+                } else showUserInputErrors(phoneNumber, password)
             }
         }
     }
 
     private fun showUserInputErrors(phoneNumber: String, password: String) {
         with(binding) {
-            if (PhoneNumberValidator(phoneNumber).hasLengthEmpty())
-                tilPhone.error = "Номер телефона не должен быть пустым"
-            else if (PhoneNumberValidator(phoneNumber).hasEnteredLessValueThanRequired())
-                tilPhone.error = "Номер телефона должен состоять из 9 символов"
-            else
-                tilPhone.isErrorEnabled = false
-            if (PasswordValidator(password).hasLengthEmpty())
-                tilPassword.error = "Пароль не должен быть пустым"
-            else if (PasswordValidator(password).hasCyrillicLetters())
-                tilPassword.error = "Пароль не должен содержать символов кириллицы"
-            else if (PasswordValidator(password).hasEnteredMoreValueThanRequired())
-                tilPassword.error = "Пароль введен больше, чем необходимо"
-            else
-                tilPassword.isErrorEnabled = false
+            if (PhoneNumberValidator(phoneNumber).hasLengthEmpty()) tilPhone.error =
+                "Номер телефона не должен быть пустым"
+            else if (PhoneNumberValidator(phoneNumber).hasEnteredLessValueThanRequired()) tilPhone.error =
+                "Номер телефона должен состоять из 9 символов"
+            else tilPhone.isErrorEnabled = false
+            if (PasswordValidator(password).hasLengthEmpty()) tilPassword.error =
+                "Пароль не должен быть пустым"
+            else if (PasswordValidator(password).hasCyrillicLetters()) tilPassword.error =
+                "Пароль не должен содержать символов кириллицы"
+            else if (PasswordValidator(password).hasEnteredMoreValueThanRequired()) tilPassword.error =
+                "Пароль введен больше, чем необходимо"
+            else tilPassword.isErrorEnabled = false
         }
     }
 
     private fun userInputsSuccessfullyValidated(phoneNumber: String, password: String): Boolean {
-        return !PhoneNumberValidator(phoneNumber).hasLengthEmpty() &&
-                !PhoneNumberValidator(phoneNumber).hasEnteredLessValueThanRequired() &&
-                !PasswordValidator(password).hasLengthEmpty() &&
-                !PasswordValidator(password).hasCyrillicLetters() &&
-                !PasswordValidator(password).hasEnteredMoreValueThanRequired()
+        return !PhoneNumberValidator(phoneNumber).hasLengthEmpty() && !PhoneNumberValidator(
+            phoneNumber
+        ).hasEnteredLessValueThanRequired() && !PasswordValidator(password).hasLengthEmpty() && !PasswordValidator(
+            password
+        ).hasCyrillicLetters() && !PasswordValidator(password).hasEnteredMoreValueThanRequired()
     }
 
     private fun showLoadingDialog() {
@@ -175,13 +170,18 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
 
     private fun changeSystemBarsAndIconsColor() {
         val window = requireActivity().window
+        val decorView = window.decorView
         window.statusBarColor = ContextCompat.getColor(requireContext(), R.color.white)
         window.navigationBarColor = ContextCompat.getColor(requireContext(), R.color.white)
 
-//        with(ViewCompat.getWindowInsetsController(window.decorView)!!) {
-//            isAppearanceLightNavigationBars = true
-//            isAppearanceLightStatusBars = true
-//        }
+        if (Build.VERSION.SDK_INT > Build.VERSION_CODES.Q) {
+            with(ViewCompat.getWindowInsetsController(decorView)!!) {
+                isAppearanceLightNavigationBars = true
+                isAppearanceLightStatusBars = true
+            }
+        } else {
+
+        }
     }
 
     private fun navigateTo(direction: Int) {

@@ -1,6 +1,7 @@
 package com.example.karsoftrivojyulduz.presentation.ui.signin.viewmodel
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.example.karsoftrivojyulduz.data.repository.SignInRepositoryImpl
 import com.example.karsoftrivojyulduz.domain.model.signin.SignInRequestData
 import com.example.karsoftrivojyulduz.domain.model.signin.SignInResponseData
@@ -9,6 +10,7 @@ import com.example.karsoftrivojyulduz.util.convertor.JSONObjectConvertor
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.launch
 
 class SignInViewModel(private val loginRepositoryImpl: SignInRepositoryImpl) : ViewModel() {
 
@@ -22,15 +24,15 @@ class SignInViewModel(private val loginRepositoryImpl: SignInRepositoryImpl) : V
     val errorFlow: Flow<String> get() = _errorFlow
 
     suspend fun signIn(body: SignInRequestData) {
-        val loginUseCaseImpl = SignInUseCaseImpl(loginRepositoryImpl)
+        viewModelScope.launch {
+            val loginUseCaseImpl = SignInUseCaseImpl(loginRepositoryImpl)
 
-        loginUseCaseImpl.execute(body)
-            .catch {
+            loginUseCaseImpl.execute(body).catch {
                 _errorFlow.emit(it.localizedMessage ?: "")
-            }
-            .collect {
+            }.collect {
                 if (it.isSuccessful) it.body()?.let { data -> _successFlow.emit(data) }
                 else _messageFlow.emit(JSONObjectConvertor().convertErrorObjectToMessage(it) ?: "")
             }
+        }
     }
 }

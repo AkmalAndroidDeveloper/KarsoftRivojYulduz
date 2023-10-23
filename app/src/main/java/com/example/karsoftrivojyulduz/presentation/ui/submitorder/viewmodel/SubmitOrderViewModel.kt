@@ -7,8 +7,6 @@ import com.example.karsoftrivojyulduz.data.repository.SimpleOrderRepositoryImpl
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderImagesRequestData
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderImagesResponseData
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.SimpleOrderResponseData
-import com.example.karsoftrivojyulduz.domain.model.submitOrder.SubmitImagesCacheData
-import com.example.karsoftrivojyulduz.domain.usecase.SubmitOrderImagesUseCase
 import com.example.karsoftrivojyulduz.domain.usecase.impl.OrderImagesUseCaseImpl
 import com.example.karsoftrivojyulduz.domain.usecase.impl.SimpleOrderUseCaseImpl
 import com.example.karsoftrivojyulduz.util.convertor.JSONObjectConvertor
@@ -20,8 +18,7 @@ import kotlinx.coroutines.launch
 class SubmitOrderViewModel(
     private val orderImagesRepositoryImpl: OrderImagesRepositoryImpl,
     private val simpleOrderRepositoryImpl: SimpleOrderRepositoryImpl
-) :
-    ViewModel() {
+) : ViewModel() {
 
     // insert order images
     private val _successOrderImagesFlow = MutableSharedFlow<OrderImagesResponseData>()
@@ -47,30 +44,30 @@ class SubmitOrderViewModel(
     suspend fun insertOrderImages(
         orderImagesRequestData: OrderImagesRequestData
     ) {
-        val orderImagesUseCaseImpl = OrderImagesUseCaseImpl(orderImagesRepositoryImpl)
+        viewModelScope.launch {
+            val orderImagesUseCaseImpl = OrderImagesUseCaseImpl(orderImagesRepositoryImpl)
 
-        orderImagesUseCaseImpl.execute(orderImagesRequestData).catch {
-            it.printStackTrace()
-            _errorOrderImagesFlow.emit(it.localizedMessage ?: "")
-        }.collect {
-            if (it.isSuccessful) it.body()?.let { data -> _successOrderImagesFlow.emit(data) }
-            else _messageOrderImagesFlow.emit(
-                JSONObjectConvertor().convertErrorObjectToMessage(it) ?: ""
-            )
+            orderImagesUseCaseImpl.execute(orderImagesRequestData).catch {
+                it.printStackTrace()
+                _errorOrderImagesFlow.emit(it.localizedMessage ?: "")
+            }.collect {
+                if (it.isSuccessful) it.body()?.let { data -> _successOrderImagesFlow.emit(data) }
+                else _messageOrderImagesFlow.emit(
+                    JSONObjectConvertor().convertErrorObjectToMessage(it) ?: ""
+                )
+            }
         }
     }
 
     suspend fun getSimpleOrder(orderId: Int) {
-        val simpleOrderUseCaseImpl = SimpleOrderUseCaseImpl(simpleOrderRepositoryImpl)
+        viewModelScope.launch {
+            val simpleOrderUseCaseImpl = SimpleOrderUseCaseImpl(simpleOrderRepositoryImpl)
 
-        simpleOrderUseCaseImpl.execute(orderId)
-            .catch {
+            simpleOrderUseCaseImpl.execute(orderId).catch {
                 it.printStackTrace()
                 _errorSimpleOrderFlow.emit(it.localizedMessage ?: "")
-            }
-            .collect {
-                if (it.isSuccessful)
-                    it.body()?.let { data -> _successSimpleOrderFlow.emit(data) }
+            }.collect {
+                if (it.isSuccessful) it.body()?.let { data -> _successSimpleOrderFlow.emit(data) }
                 else {
                     _messageSimpleOrderFlow.emit(
                         JSONObjectConvertor().convertErrorObjectToMessage(
@@ -79,5 +76,6 @@ class SubmitOrderViewModel(
                     )
                 }
             }
+        }
     }
 }

@@ -6,7 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     android:orientation="vertical"
-    tools:context=".presentation.ui.submitorder.SumbitOrderFragment">
+    tools:context=".presentation.ui.submitorder.SubmitOrderFragment">
 
     <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
@@ -269,6 +269,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:visibility="invisible"
                 android:backgroundTint="@color/blue"
                 android:fontFamily="@font/inter_semibold"
                 android:text="@string/submit_order_btn"

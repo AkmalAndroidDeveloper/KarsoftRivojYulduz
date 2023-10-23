@@ -5,13 +5,12 @@ import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.recyclerview.widget.RecyclerView
 import com.example.karsoftrivojyulduz.databinding.ItemOfRecyclerViewOrdersBinding
-import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.Data
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderAndHistoryResponseData
 
 class OrdersAdapter : RecyclerView.Adapter<OrdersAdapter.ViewHolder>() {
 
     private var listOfOrder: List<OrderAndHistoryResponseData.Data>? = null
-    private var onItemClick: ((OrderAndHistoryResponseData.Data, Int) -> Unit)? = null
+    private var onItemClick: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String) -> Unit)? = null
 
     inner class ViewHolder(private val binding: ItemOfRecyclerViewOrdersBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -24,13 +23,17 @@ class OrdersAdapter : RecyclerView.Adapter<OrdersAdapter.ViewHolder>() {
                 tvCustomerPhoneNumber.text = data.contact.phone
 
                 root.setOnClickListener {
-                    onItemClick?.invoke(data, data.id)
+                    onItemClick?.invoke(data, data.id,
+                        data.contact.title.toString(),
+                        data.contact.address.toString(),
+                        data.contact.name,
+                        data.contact.phone)
                 }
             }
         }
     }
 
-    fun setOnItemClickListener(block: ((OrderAndHistoryResponseData.Data, Int) -> Unit)) {
+    fun setOnItemClickListener(block: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String) -> Unit)) {
         onItemClick = block
     }
 
@@ -40,9 +43,7 @@ class OrdersAdapter : RecyclerView.Adapter<OrdersAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = ItemOfRecyclerViewOrdersBinding.inflate(
-            LayoutInflater.from(parent.context),
-            parent,
-            false
+            LayoutInflater.from(parent.context), parent, false
         )
         return ViewHolder(view)
     }
