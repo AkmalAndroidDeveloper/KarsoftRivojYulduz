@@ -106,7 +106,6 @@
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
                         <TextView
@@ -133,7 +132,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
                         <TextView
@@ -160,7 +158,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
                         <TextView
@@ -187,7 +184,6 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:layout_marginTop="8dp"
-                        android:gravity="center_vertical"
                         android:orientation="horizontal">
 
                         <TextView
@@ -205,6 +201,7 @@
                             android:ellipsize="end"
                             android:fontFamily="@font/inter"
                             android:maxLines="1"
+                            android:textColor="@color/blue"
                             android:textSize="16sp"
                             tools:text="@string/test_order_phone_number" />
 
@@ -244,14 +241,14 @@
                         <ImageView
                             android:layout_width="40dp"
                             android:layout_height="40dp"
-                            android:src="@drawable/ic_no_photos"
                             android:scaleType="centerCrop"
+                            android:src="@drawable/ic_no_photos"
                             app:tint="@color/gray" />
 
                         <TextView
                             android:layout_width="match_parent"
-                            android:layout_marginTop="4dp"
                             android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
                             android:fontFamily="@font/inter_semibold"
                             android:text="@string/no_photos"
                             android:textAlignment="center"
@@ -262,6 +259,13 @@
 
                 </FrameLayout>
 
+<!--                <ProgressBar-->
+<!--                    android:id="@+id/progress_bar"-->
+<!--                    android:layout_width="wrap_content"-->
+<!--                    android:layout_height="wrap_content"-->
+<!--                    android:layout_gravity="center"-->
+<!--                    android:indeterminateTint="@color/blue" />-->
+
             </FrameLayout>
 
             <com.google.android.material.button.MaterialButton
@@ -269,10 +273,10 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
-                android:visibility="invisible"
                 android:backgroundTint="@color/blue"
                 android:fontFamily="@font/inter_semibold"
                 android:text="@string/submit_order_btn"
+                android:visibility="invisible"
                 app:cornerRadius="6dp" />
 
         </LinearLayout>

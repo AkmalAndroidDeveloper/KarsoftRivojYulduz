@@ -9,7 +9,7 @@ data class OrderAndHistoryResponseData(
     data class Data(
         val comment: String,
         val contact: Contact,
-        val height: Int,
+        val height: Long,
         val id: Int,
         val paid: Boolean,
         val payment_url: String,
@@ -17,7 +17,7 @@ data class OrderAndHistoryResponseData(
         val quantity: Int,
         val status_id: Int,
         val status_name: String,
-        val total_amount: Int,
+        val total_amount: Long,
         val width: Any? = null
     )
 

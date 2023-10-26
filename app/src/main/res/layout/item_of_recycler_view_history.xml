@@ -33,7 +33,7 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/inter_semibold"
                 android:maxLines="3"
-                android:text="@string/test_order_title"
+                tools:text="@string/test_order_title"
                 android:textColor="@color/black"
                 android:textSize="16sp" />
 
@@ -50,7 +50,6 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:gravity="center_vertical"
             android:orientation="horizontal"
             tools:ignore="UseCompoundDrawables">
 
@@ -69,7 +68,7 @@
                 android:ellipsize="end"
                 android:fontFamily="@font/inter"
                 android:maxLines="3"
-                android:text="@string/test_order_location"
+                tools:text="@tools:sample/lorem/random"
                 android:textAllCaps="true"
                 android:textColor="@color/black" />
 

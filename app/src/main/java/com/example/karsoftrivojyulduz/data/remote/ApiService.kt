@@ -1,7 +1,6 @@
 package com.example.karsoftrivojyulduz.data.remote
 
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderAndHistoryResponseData
-import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderImagesRequestData
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderImagesResponseData
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.SimpleOrderResponseData
 import com.example.karsoftrivojyulduz.domain.model.signin.SignInRequestData
@@ -19,6 +18,12 @@ import retrofit2.http.Query
 
 interface ApiService {
 
+    @GET("api/v1/measurer/orders")
+    suspend fun getAllOrders(@Query("status") status: String): Response<OrderAndHistoryResponseData>
+
+    @GET("api/v1/measurer/orders/{id}")
+    suspend fun getSimpleOrder(@Path("id") orderId: Int): Response<SimpleOrderResponseData>
+
     @POST("api/v1/auth/login")
     suspend fun signIn(@Body body: SignInRequestData): Response<SignInResponseData>
 
@@ -29,10 +34,4 @@ interface ApiService {
         @Part("description") description: RequestBody,
         @Part images: List<MultipartBody.Part>
     ): Response<OrderImagesResponseData>
-
-    @GET("api/v1/measurer/orders")
-    suspend fun getAllOrders(@Query("status") status: String): Response<OrderAndHistoryResponseData>
-
-    @GET("api/v1/measurer/orders/{id}")
-    suspend fun getSimpleOrder(@Path("id") orderId: Int): Response<SimpleOrderResponseData>
 }

@@ -1,11 +1,13 @@
 package com.example.karsoftrivojyulduz.domain.model.submitorder
 
-import android.graphics.Bitmap
-import android.net.Uri
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import com.example.karsoftrivojyulduz.util.constant.Constants
 
+@Entity(tableName = Constants.TABLE_NAME)
 data class SubmitImagesData(
+    @PrimaryKey(autoGenerate = false)
     val id: Int,
     val orderId: Int,
-    val uri: Uri,
-    val image: Bitmap
+    val uri: String
 )

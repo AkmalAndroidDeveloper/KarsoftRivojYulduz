@@ -9,12 +9,18 @@ import android.util.Base64
 import android.view.View
 import androidx.core.net.toUri
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.fragment.navArgs
 import com.bumptech.glide.Glide
 import com.example.karsoftrivojyulduz.R
 import com.example.karsoftrivojyulduz.databinding.FragmentOrderImageBinding
 import com.example.karsoftrivojyulduz.util.extension.toastMessage
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 
 class OrderImageFragment : Fragment(R.layout.fragment_order_image) {
@@ -37,13 +43,9 @@ class OrderImageFragment : Fragment(R.layout.fragment_order_image) {
 
         with(binding) {
             if (!fromHistoryFragment) {
-                val bitmap = MediaStore.Images.Media.getBitmap(
-                    requireContext().contentResolver,
-                    image?.toUri()
-                )
                 Glide
                     .with(requireContext())
-                    .load(bitmap)
+                    .load(image?.toUri())
                     .centerCrop()
                     .into(ivOrderImage)
             } else {

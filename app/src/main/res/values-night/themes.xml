@@ -7,5 +7,7 @@
         <item name="android:navigationBarColor">@color/card_bg_color</item>
         <item name="android:windowLightStatusBar">false</item>
         <item name="android:windowLightNavigationBar" tools:targetApi="o_mr1">true</item>
+        <item name="android:splitMotionEvents">false</item>
+        <item name="android:windowEnableSplitTouch">false</item>
     </style>
 </resources>

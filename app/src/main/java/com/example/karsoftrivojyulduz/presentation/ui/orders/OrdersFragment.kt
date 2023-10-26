@@ -1,9 +1,12 @@
 package com.example.karsoftrivojyulduz.presentation.ui.orders
 
+import android.Manifest
+import android.content.pm.PackageManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import androidx.activity.OnBackPressedCallback
 import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.fragment.app.Fragment
@@ -48,6 +51,22 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         initLogOutDialog()
         initObservables()
         initListeners()
+        setUpOnBackPressedCallback()
+    }
+
+    private fun setUpOnBackPressedCallback() {
+        val onBackPressedCallback = object : OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                requireActivity().finish()
+            }
+        }
+        requireActivity().onBackPressedDispatcher.addCallback(
+            viewLifecycleOwner, onBackPressedCallback
+        )
+    }
+
+    private fun popBackStack() {
+        findNavController().popBackStack()
     }
 
     private fun initLogOutDialog() {
@@ -61,6 +80,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     private fun initObservables() {
         with(ordersViewModel) {
             successFlow.onEach {
+                Log.d(TAG, "list size: ${it.data.size}")
                 turnOffSwipeRefreshEffect()
                 initAdapterList(it.data)
                 checkAndChangeVisibilityWhenOrderListIsEmpty(it.data)
@@ -140,7 +160,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             ivLogOut.setOnClickListener {
                 showLogOutDialog()
             }
-            ordersAdapter.setOnItemClickListener { order, orderId, title, address, customerName, customerPhoneNumber ->
+            ordersAdapter.setOnItemClickListener { order, orderId, title, address, customerName, customerPhoneNumber, container ->
                 val direction = OrdersFragmentDirections.actionMainFragmentToOrderFragment(
                     orderId,
                     false,
@@ -156,7 +176,11 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             }
             logOutDialog.onYesButtonClickListener {
                 LocalStorage().fromOrdersFragment = true
-                navigateTo(R.id.signInFragment)
+                if (LocalStorage().isLogin)
+                    LocalStorage().isLogin = false
+
+                if (!LocalStorage().isLogin)
+                    popBackStack()
             }
             logOutDialog.onNoButtonClickListener {
                 dismissLogOutDialog()

@@ -24,9 +24,6 @@
             app:popEnterAnim="@anim/fade_in"
             app:popExitAnim="@anim/slide_out"
             app:destination="@id/orderFragment" />
-        <action
-            android:id="@+id/action_mainFragment_to_signInFragment"
-            app:destination="@id/signInFragment" />
     </fragment>
     <fragment
         android:id="@+id/historyFragment"
@@ -97,8 +94,6 @@
             app:enterAnim="@anim/slide_in"
             app:exitAnim="@anim/fade_out"
             app:popEnterAnim="@anim/fade_in"
-            app:popUpTo="@id/signInFragment"
-            app:popUpToInclusive="true"
             app:popExitAnim="@anim/slide_out"
             app:destination="@id/mainFragment" />
     </fragment>

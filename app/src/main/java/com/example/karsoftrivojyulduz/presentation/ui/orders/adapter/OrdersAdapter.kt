@@ -1,16 +1,19 @@
 package com.example.karsoftrivojyulduz.presentation.ui.orders.adapter
 
 import android.annotation.SuppressLint
+import android.graphics.Paint
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.cardview.widget.CardView
 import androidx.recyclerview.widget.RecyclerView
 import com.example.karsoftrivojyulduz.databinding.ItemOfRecyclerViewOrdersBinding
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderAndHistoryResponseData
 
+
 class OrdersAdapter : RecyclerView.Adapter<OrdersAdapter.ViewHolder>() {
 
     private var listOfOrder: List<OrderAndHistoryResponseData.Data>? = null
-    private var onItemClick: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String) -> Unit)? = null
+    private var onItemClick: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String, CardView) -> Unit)? = null
 
     inner class ViewHolder(private val binding: ItemOfRecyclerViewOrdersBinding) :
         RecyclerView.ViewHolder(binding.root) {
@@ -21,19 +24,22 @@ class OrdersAdapter : RecyclerView.Adapter<OrdersAdapter.ViewHolder>() {
                 tvOrderId.text = "№${data.id}"
                 tvOrderLocation.text = data.contact.address.toString()
                 tvCustomerPhoneNumber.text = data.contact.phone
+                container.isClickable = false
 
                 root.setOnClickListener {
                     onItemClick?.invoke(data, data.id,
                         data.contact.title.toString(),
                         data.contact.address.toString(),
                         data.contact.name,
-                        data.contact.phone)
+                        data.contact.phone,
+                        container
+                    )
                 }
             }
         }
     }
 
-    fun setOnItemClickListener(block: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String) -> Unit)) {
+    fun setOnItemClickListener(block: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String, CardView) -> Unit)) {
         onItemClick = block
     }
 

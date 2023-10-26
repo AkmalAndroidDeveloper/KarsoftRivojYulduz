@@ -1,13 +1,14 @@
 package com.example.karsoftrivojyulduz.domain.usecase
 
-import com.example.karsoftrivojyulduz.domain.model.submitorder.SubmitImagesCacheData
+import com.example.karsoftrivojyulduz.domain.model.submitorder.SubmitImagesData
 import kotlinx.coroutines.flow.Flow
 
 interface SubmitOrderImagesUseCase {
 
-    fun insertImage(submitImagesCacheData: SubmitImagesCacheData)
+    suspend fun insertImage(submitImagesCacheData: SubmitImagesData)
 
-    fun getAllImages(orderId: Int): Flow<List<SubmitImagesCacheData>>
+    suspend fun getAllImages(orderId: Int): Flow<List<SubmitImagesData>>
 
-    fun deleteImagesById(orderId: Int)
+    suspend fun deleteImage(submitImagesData: SubmitImagesData)
+
 }
