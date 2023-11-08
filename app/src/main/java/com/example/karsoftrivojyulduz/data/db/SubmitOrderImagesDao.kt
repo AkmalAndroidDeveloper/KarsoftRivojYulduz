@@ -17,6 +17,15 @@ interface SubmitOrderImagesDao {
     @Delete
     suspend fun deleteImage(submitImagesData: SubmitImagesData)
 
-    @Query("SELECT * FROM ${Constants.TABLE_NAME} WHERE orderId = :orderId")
-    suspend fun getAllImages(orderId: Int): List<SubmitImagesData>
+    @Query("SELECT * FROM ${Constants.TABLE_NAME} WHERE orderId = :orderId AND statusId = :statusId")
+    suspend fun getImages(orderId: Int, statusId: Int): List<SubmitImagesData>
+
+    @Query("DELETE FROM ${Constants.TABLE_NAME} WHERE orderId = :orderId AND statusId = :statusId")
+    suspend fun deleteImagesByOrderId(orderId: Int, statusId: Int)
+
+    @Query("UPDATE ${Constants.TABLE_NAME} SET statusId = :statusId")
+    suspend fun updateImagesByStatusId(statusId: Int)
+
+    @Query("SELECT COUNT(*) FROM ${Constants.TABLE_NAME}")
+    suspend fun getImagesSize(): Int
 }

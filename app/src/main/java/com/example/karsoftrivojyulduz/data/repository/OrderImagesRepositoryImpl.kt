@@ -12,7 +12,7 @@ import retrofit2.Response
 class OrderImagesRepositoryImpl(private val apiService: ApiService) : OrderImagesRepository {
     override suspend fun insertOrdersImages(orderImagesRequestData: OrderImagesRequestData) = flow {
         val response = apiService.insertOrdersImages(
-            orderImagesRequestData.order_id,
+            orderImagesRequestData.orderId,
             orderImagesRequestData.description,
             orderImagesRequestData.images
         )

@@ -106,6 +106,20 @@
 
         </LinearLayout>
 
+        <TextView
+            android:id="@+id/tv_status"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="end"
+            android:layout_marginTop="24dp"
+            android:ellipsize="end"
+            android:fontFamily="@font/inter_semibold"
+            android:maxLines="1"
+            tools:text="@string/successfully_finished"
+            android:textAlignment="center"
+            android:textColor="@color/green"
+            tools:ignore="RtlCompat" />
+
     </LinearLayout>
 
 </androidx.cardview.widget.CardView>

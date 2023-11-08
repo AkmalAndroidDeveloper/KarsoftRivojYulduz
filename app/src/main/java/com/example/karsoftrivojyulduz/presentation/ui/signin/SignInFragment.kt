@@ -44,16 +44,21 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
 
+        initValues()
+        initObservables()
+        initListeners()
+
+        if (!LocalStorage().fromOrdersFragment)
+            if (LocalStorage().isLogin) {
+            navigateTo(R.id.action_signInFragment_to_mainFragment)
+        }
+    }
+
+    private fun initValues() {
         changeSystemBarsAndIconsColor()
         setUpMaskForInputPhoneNumber()
         initLoadingDialog()
-        initListeners()
-        initObservables()
         setUpOnBackPressedCallback()
-
-        if (!LocalStorage().fromOrdersFragment) if (LocalStorage().isLogin) {
-            navigateTo(R.id.action_signInFragment_to_mainFragment)
-        }
     }
 
     private fun setUpOnBackPressedCallback() {
@@ -76,6 +81,8 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
             successFlow.onEach {
                 saveUserDataToStorage(it)
                 dismissLoadingDialog()
+                binding.etPhone.isFocusable = false
+                binding.etPassword.isFocusable = false
                 navigateTo(R.id.action_signInFragment_to_mainFragment)
             }.launchIn(lifecycleScope)
             messageFlow.onEach {
@@ -117,8 +124,6 @@ class SignInFragment : Fragment(R.layout.fragment_sign_in) {
                     disableUserInputsErrors()
 
                     LocalStorage().fromOrdersFragment = false
-                    tilPhone.isFocusable = false
-                    tilPassword.isFocusable = false
                 } else showUserInputErrors(phoneNumber, password)
             }
         }

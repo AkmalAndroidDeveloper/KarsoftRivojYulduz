@@ -1,6 +1,8 @@
 package com.example.karsoftrivojyulduz.di
 
+import androidx.core.os.BuildCompat
 import com.example.bookie.data.remote.interceptors.AccessTokenInterceptor
+import com.example.karsoftrivojyulduz.BuildConfig
 import com.example.karsoftrivojyulduz.data.remote.ApiService
 import com.example.karsoftrivojyulduz.util.constant.Constants
 import com.google.gson.GsonBuilder
@@ -31,7 +33,7 @@ val networkModule = module {
 
         Retrofit.Builder()
             .addConverterFactory(GsonConverterFactory.create(gson))
-            .baseUrl(Constants.BASE_URL)
+            .baseUrl(BuildConfig.BASE_URL)
             .client(okHttpClient)
             .build()
     }

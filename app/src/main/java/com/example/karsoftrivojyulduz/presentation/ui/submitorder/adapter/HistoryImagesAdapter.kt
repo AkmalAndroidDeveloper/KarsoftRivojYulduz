@@ -25,7 +25,7 @@ class HistoryImagesAdapter(
         @SuppressLint("SetTextI18n")
         fun onBind(image: Image, position: Int) {
             with(binding) {
-                Glide.with(context).load(image.image_url).centerCrop().into(ivOrderImage)
+                Glide.with(context).load(image.imageUrl).centerCrop().into(ivOrderImage)
 
                 root.setOnClickListener {
                     onClickItem?.invoke(image, position, cardSelect)

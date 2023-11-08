@@ -1,4 +1,4 @@
-package com.example.karsoftrivojyulduz.presentation.ui.dialog.submitorder
+package com.example.karsoftrivojyulduz.presentation.ui.dialog.permission
 
 import android.graphics.Color
 import android.graphics.drawable.ColorDrawable
@@ -6,18 +6,20 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.DialogFragment
 import com.example.karsoftrivojyulduz.R
-import com.example.karsoftrivojyulduz.databinding.DialogSubmitOrderBinding
+import com.example.karsoftrivojyulduz.databinding.DialogLogOutBinding
+import com.example.karsoftrivojyulduz.databinding.DialogRequestPermissionBinding
+import com.example.karsoftrivojyulduz.util.constant.Permission
 
-class SubmitOrderDialog : DialogFragment(R.layout.dialog_submit_order) {
+class RequestPermissionDialog : DialogFragment(R.layout.dialog_request_permission) {
 
-    private var _binding: DialogSubmitOrderBinding? = null
+    private var _binding: DialogRequestPermissionBinding? = null
     private var onYesButtonClick: ((View) -> Unit)? = null
     private var onNoButtonClick: ((View) -> Unit)? = null
 
     private val binding get() = _binding!!
 
     companion object {
-        const val TAG = "SubmitOrderDialog"
+        const val TAG = "RequestPermissionDialog"
     }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
@@ -26,18 +28,6 @@ class SubmitOrderDialog : DialogFragment(R.layout.dialog_submit_order) {
 
         setDialogBackgroundTransparent()
         initListeners()
-    }
-
-    private fun bindView(view: View) {
-        _binding = DialogSubmitOrderBinding.bind(view)
-    }
-
-    private fun unBindView() {
-        _binding = null
-    }
-
-    private fun setDialogBackgroundTransparent() {
-        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
     }
 
     private fun initListeners() {
@@ -51,6 +41,18 @@ class SubmitOrderDialog : DialogFragment(R.layout.dialog_submit_order) {
                 dismiss()
             }
         }
+    }
+
+    private fun setDialogBackgroundTransparent() {
+        dialog?.window?.setBackgroundDrawable(ColorDrawable(Color.TRANSPARENT))
+    }
+
+    private fun unBindView() {
+        _binding = null
+    }
+
+    private fun bindView(view: View) {
+        _binding = DialogRequestPermissionBinding.bind(view)
     }
 
     fun onYesButtonClickListener(block: (View) -> Unit) {

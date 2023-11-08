@@ -8,6 +8,8 @@ import com.example.karsoftrivojyulduz.util.constant.Constants
 data class SubmitImagesData(
     @PrimaryKey(autoGenerate = false)
     val id: Int,
+    val statusId: Int,
     val orderId: Int,
-    val uri: String
+    val uri: String,
+    val path: String
 )

@@ -18,6 +18,10 @@ class LoadingDialog: DialogFragment(R.layout.dialog_loading) {
     private val binding get() = _binding!!
     private var onClickCancel: (() -> Unit)? = null
 
+    companion object {
+        const val TAG = "LoadingDialog"
+    }
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)

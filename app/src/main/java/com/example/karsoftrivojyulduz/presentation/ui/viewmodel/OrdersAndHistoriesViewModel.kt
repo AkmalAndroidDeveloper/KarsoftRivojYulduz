@@ -1,5 +1,6 @@
 package com.example.karsoftrivojyulduz.presentation.ui.viewmodel
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.karsoftrivojyulduz.data.repository.OrdersRepositoryImpl
@@ -16,6 +17,11 @@ import kotlinx.coroutines.launch
 
 class OrdersAndHistoriesViewModel(private val ordersRepositoryImpl: OrdersRepositoryImpl) :
     ViewModel() {
+
+    override fun onCleared() {
+        Log.d("AAAAAA", "Viewmodel cleared")
+        super.onCleared()
+    }
 
     private val _successFlow = MutableSharedFlow<OrderAndHistoryResponseData>()
     val successFlow: Flow<OrderAndHistoryResponseData> = _successFlow

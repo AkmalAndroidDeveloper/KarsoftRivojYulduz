@@ -17,9 +17,19 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:fontFamily="@font/inter_semibold"
+            android:text="@string/permission_denied"
+            android:textAlignment="center"
+            android:textColor="@color/black"
+            android:textSize="18sp" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
             android:layout_marginBottom="24dp"
             android:fontFamily="@font/inter_semibold"
-            android:text="@string/are_you_sure_you_want_to_log_out"
+            android:text="@string/permission_granted"
             android:textAlignment="center"
             android:textColor="@color/black"
             android:textSize="16sp" />

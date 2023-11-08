@@ -38,6 +38,7 @@
                 android:id="@+id/iv_history"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_history"
                 app:tint="@color/white"
                 tools:ignore="ContentDescription" />
@@ -47,6 +48,7 @@
                 android:layout_width="24dp"
                 android:layout_height="24dp"
                 android:layout_marginStart="16dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_logout"
                 app:tint="@color/white"
                 tools:ignore="ContentDescription" />
@@ -78,9 +80,9 @@
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:gravity="center"
-                android:visibility="invisible"
                 android:orientation="vertical"
                 android:padding="16dp"
+                android:visibility="invisible"
                 tools:ignore="UseCompoundDrawables">
 
                 <ImageView

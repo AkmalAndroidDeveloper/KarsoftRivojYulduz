@@ -10,9 +10,12 @@ class LocalStorage {
             App.instance.getSharedPreferences("sharedPref", Context.MODE_PRIVATE)
     }
 
+    var cameraPermissionCount by IntPreference(pref, 0)
+    var galleryPermissionCount by IntPreference(pref, 0)
+
     var token by StringPreference(pref)
 
     var isLogin by BooleanPreference(pref, false)
-
     var fromOrdersFragment by BooleanPreference(pref, false)
+    var hasFristRequestOnOrder by BooleanPreference(pref, false)
 }

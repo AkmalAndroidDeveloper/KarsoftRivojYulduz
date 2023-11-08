@@ -1,7 +1,6 @@
 package com.example.karsoftrivojyulduz.presentation.ui.orders
 
-import android.Manifest
-import android.content.pm.PackageManager
+import android.content.Intent
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
@@ -38,19 +37,21 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     private val binding get() = _binding!!
     private val ordersViewModel by viewModel<OrdersAndHistoriesViewModel>()
 
-    companion object {
-        private const val TAG = "OrdersFragment"
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
 
-        changeSystemBarsAndIconsColor()
-        initOrdersAdapter()
-        initLogOutDialog()
+        initValues()
         initObservables()
         initListeners()
+    }
+
+    private fun initValues() {
+        changeSystemBarsAndIconsColor()
+        initOrdersAdapter()
+        setUpRecyclerViewLayoutManager()
+        setUpRecyclerViewAdapter()
+        initLogOutDialog()
         setUpOnBackPressedCallback()
     }
 
@@ -65,10 +66,6 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
         )
     }
 
-    private fun popBackStack() {
-        findNavController().popBackStack()
-    }
-
     private fun initLogOutDialog() {
         logOutDialog = LogOutDialog()
     }
@@ -80,21 +77,15 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     private fun initObservables() {
         with(ordersViewModel) {
             successFlow.onEach {
-                Log.d(TAG, "list size: ${it.data.size}")
                 turnOffSwipeRefreshEffect()
                 initAdapterList(it.data)
                 checkAndChangeVisibilityWhenOrderListIsEmpty(it.data)
-                setUpRecyclerViewLayoutManager()
-                setUpRecyclerViewAdapter()
             }.launchIn(lifecycleScope)
             messageFlow.onEach {
                 turnOffSwipeRefreshEffect()
-                toastMessage(it)
-                Log.d(TAG, "MessageFlow: $it")
             }.launchIn(lifecycleScope)
             errorFlow.onEach {
                 turnOffSwipeRefreshEffect()
-                Log.d(TAG, "ErrorFlow: $it")
             }.launchIn(lifecycleScope)
         }
     }
@@ -112,7 +103,13 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
     }
 
     private fun initAdapterList(it: List<OrderAndHistoryResponseData.Data>) {
-        ordersAdapter.submitList(it)
+        val newOrdersList = it.filter { it.statusId == Constants.METER_ATTACHED }.sortedByDescending { it.id }
+        val redoOrderList = it.filter { it.statusId == Constants.REDO_THE_WORK }.sortedByDescending { it.id }
+        val resultList = mutableListOf<OrderAndHistoryResponseData.Data>().apply {
+            addAll(newOrdersList)
+            addAll(redoOrderList)
+        }
+        ordersAdapter.submitList(resultList)
     }
 
     private fun changeSystemBarsAndIconsColor() {
@@ -160,14 +157,15 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
             ivLogOut.setOnClickListener {
                 showLogOutDialog()
             }
-            ordersAdapter.setOnItemClickListener { order, orderId, title, address, customerName, customerPhoneNumber, container ->
+            ordersAdapter.setOnItemClickListener { data ->
                 val direction = OrdersFragmentDirections.actionMainFragmentToOrderFragment(
-                    orderId,
+                    data.id,
                     false,
-                    title,
-                    address,
-                    customerName,
-                    customerPhoneNumber
+                    data.contact.title.toString(),
+                    data.contact.address.toString(),
+                    data.contact.name,
+                    data.contact.phone,
+                    data.statusId
                 )
                 navigateTo(direction)
             }
@@ -180,7 +178,7 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                     LocalStorage().isLogin = false
 
                 if (!LocalStorage().isLogin)
-                    popBackStack()
+                    navigateTo(R.id.signInFragment)
             }
             logOutDialog.onNoButtonClickListener {
                 dismissLogOutDialog()

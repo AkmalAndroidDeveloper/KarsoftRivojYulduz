@@ -1,16 +1,22 @@
 package com.example.karsoftrivojyulduz.presentation.ui.histories.adapter
 
 import android.annotation.SuppressLint
+import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
+import com.example.karsoftrivojyulduz.R
 import com.example.karsoftrivojyulduz.databinding.ItemOfRecyclerViewHistoryBinding
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderAndHistoryResponseData
+import com.example.karsoftrivojyulduz.util.constant.Constants
 
-class HistoriesAdapter : RecyclerView.Adapter<HistoriesAdapter.ViewHolder>() {
+class HistoriesAdapter(
+    private val context: Context
+) : RecyclerView.Adapter<HistoriesAdapter.ViewHolder>() {
 
-    private var listOfHistory: List<OrderAndHistoryResponseData.Data>? = null
-    private var onItemClick: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String) -> Unit)? =
+    private var listOfHistory: List<OrderAndHistoryResponseData.Data> = listOf()
+    private var onItemClick: ((OrderAndHistoryResponseData.Data) -> Unit)? =
         null
 
     inner class ViewHolder(private val binding: ItemOfRecyclerViewHistoryBinding) :
@@ -22,27 +28,31 @@ class HistoriesAdapter : RecyclerView.Adapter<HistoriesAdapter.ViewHolder>() {
                 tvOrderId.text = "№${data.id}"
                 tvOrderLocation.text = data.contact.address.toString()
                 tvCustomerPhoneNumber.text = data.contact.phone
+                tvOrderCreatedDate.text = formatDate(data.createdAt)
+                tvOrderSubmittedDate.text = formatDate(data.submittedAt)
+
+                if (data.statusId == Constants.METER_HAS_COMPLETED_ITS_WORK)
+                    tvStatus.text = context.getString(R.string.successfully_finished)
 
                 root.setOnClickListener {
-                    onItemClick?.invoke(
-                        data,
-                        data.id,
-                        data.contact.title.toString(),
-                        data.contact.address.toString(),
-                        data.contact.name,
-                        data.contact.phone
-                    )
+                    onItemClick?.invoke(data)
                 }
             }
         }
+
+        private fun formatDate(date: String): String {
+            return date.substring(0, date.lastIndexOf(':')).replace(" ", ", ")
+        }
     }
 
-    fun setOnItemClickListener(block: ((OrderAndHistoryResponseData.Data, Int, String, String, String, String) -> Unit)) {
+    fun setOnItemClickListener(block: ((OrderAndHistoryResponseData.Data) -> Unit)) {
         onItemClick = block
     }
 
+    @SuppressLint("NotifyDataSetChanged")
     fun submitList(listOfHistory: List<OrderAndHistoryResponseData.Data>) {
         this.listOfHistory = listOfHistory
+        notifyDataSetChanged()
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -53,12 +63,12 @@ class HistoriesAdapter : RecyclerView.Adapter<HistoriesAdapter.ViewHolder>() {
     }
 
     override fun getItemCount(): Int {
-        return listOfHistory?.size!!
+        return listOfHistory.size
     }
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.onBind(
-            listOfHistory?.get(position) ?: emptyList<OrderAndHistoryResponseData.Data>()[position]
+            listOfHistory[position]
         )
     }
 }

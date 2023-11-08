@@ -8,12 +8,10 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import androidx.cardview.widget.CardView
-import androidx.core.net.toUri
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import com.example.karsoftrivojyulduz.databinding.ItemOfRecyclerViewSubmitOrderImagesBinding
 import com.example.karsoftrivojyulduz.domain.model.submitorder.SubmitImagesData
-import com.example.karsoftrivojyulduz.domain.model.submitorder.SubmitOrderImagesData
 
 class SubmitOrderImagesAdapter(
     private val context: Context

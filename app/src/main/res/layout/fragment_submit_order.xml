@@ -24,34 +24,23 @@
                 android:id="@+id/iv_back"
                 android:layout_width="24dp"
                 android:layout_height="24dp"
+                android:background="?attr/selectableItemBackgroundBorderless"
                 android:src="@drawable/ic_back"
                 app:tint="@color/white"
                 tools:ignore="ContentDescription" />
 
             <TextView
                 android:id="@+id/tv_toolbar"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:ellipsize="end"
-                android:fontFamily="@font/inter_semibold"
-                android:maxLines="1"
-                android:paddingStart="16dp"
-                android:paddingEnd="8dp"
-                android:text="@string/submit_order"
-                android:textColor="@color/white"
-                android:textSize="18sp"
-                tools:ignore="RtlSymmetry" />
-
-            <TextView
-                android:id="@+id/tv_toolbar_number_counter"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
-                android:ellipsize="end"
+                android:ellipsize="marquee"
                 android:fontFamily="@font/inter_semibold"
-                android:maxLines="1"
+                android:marqueeRepeatLimit="marquee_forever"
+                android:paddingStart="16dp"
                 android:paddingEnd="16dp"
-                android:text="@string/test_order_id"
+                android:singleLine="true"
+                android:text="@string/submit_order"
                 android:textColor="@color/white"
                 android:textSize="18sp"
                 tools:ignore="RtlSymmetry" />
@@ -73,6 +62,7 @@
                     android:layout_width="match_parent"
                     android:layout_height="match_parent"
                     android:layout_gravity="center"
+                    android:background="?attr/selectableItemBackgroundBorderless"
                     android:src="@drawable/ic_delete"
                     android:visibility="invisible"
                     app:tint="@color/white" />
@@ -83,7 +73,7 @@
 
     </com.google.android.material.appbar.AppBarLayout>
 
-    <FrameLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1">
@@ -94,128 +84,253 @@
             android:orientation="vertical"
             android:padding="16dp">
 
-            <ScrollView
+            <androidx.cardview.widget.CardView
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content">
+                android:layout_height="wrap_content"
+                app:cardCornerRadius="8dp"
+                app:cardElevation="4dp"
+                app:cardUseCompatPadding="true"
+                app:contentPadding="16dp">
 
-                <LinearLayout
+                <ScrollView
                     android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:layout_height="wrap_content">
 
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="horizontal">
+                        android:orientation="vertical">
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_semibold"
-                            android:text="@string/title"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:id="@+id/tv_title"
+                        <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="5"
-                            android:textSize="16sp"
-                            tools:text="@string/test_order_title" />
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_semibold"
+                                android:text="@string/title"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/tv_title"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/inter"
+                                android:textSize="16sp"
+                                tools:text="@string/test_order_title" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_semibold"
+                                android:text="@string/location"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/tv_location"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/inter"
+                                android:textSize="16sp"
+                                tools:text="@string/test_order_location" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_semibold"
+                                android:text="@string/name"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/tv_customer_name"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/inter"
+                                android:textSize="16sp"
+                                tools:text="@string/test_order_customer_name" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="8dp"
+                            android:orientation="horizontal">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:fontFamily="@font/inter_semibold"
+                                android:text="@string/phone_number"
+                                android:textSize="16sp" />
+
+                            <TextView
+                                android:id="@+id/tv_customer_phone_number"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="8dp"
+                                android:ellipsize="end"
+                                android:fontFamily="@font/inter"
+                                android:maxLines="1"
+                                android:textColor="@color/blue"
+                                android:textSize="16sp"
+                                tools:text="@string/test_order_phone_number" />
+
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:id="@+id/order_data_container"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:visibility="gone">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/inter_semibold"
+                                    android:text="@string/service"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:id="@+id/tv_service"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/inter"
+                                    android:textSize="16sp"
+                                    tools:text="@string/test_order_phone_number" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/inter_semibold"
+                                    android:text="@string/height"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:id="@+id/tv_height"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/inter"
+                                    android:maxLines="1"
+                                    android:textSize="16sp"
+                                    tools:text="@string/test_order_phone_number" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/inter_semibold"
+                                    android:text="@string/width"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:id="@+id/tv_width"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/inter"
+                                    android:maxLines="1"
+                                    android:textSize="16sp"
+                                    tools:text="@string/test_order_phone_number" />
+
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="8dp"
+                                android:orientation="horizontal">
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:fontFamily="@font/inter_semibold"
+                                    android:text="@string/count"
+                                    android:textSize="16sp" />
+
+                                <TextView
+                                    android:id="@+id/tv_count"
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginStart="8dp"
+                                    android:ellipsize="end"
+                                    android:fontFamily="@font/inter"
+                                    android:maxLines="1"
+                                    android:textSize="16sp"
+                                    tools:text="@string/test_order_phone_number" />
+
+                            </LinearLayout>
+
+                        </LinearLayout>
+
+                        <ImageView
+                            android:id="@+id/iv_more_details"
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:layout_gravity="end"
+                            android:src="@drawable/ic_arrow_down" />
 
                     </LinearLayout>
 
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
+                </ScrollView>
 
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_semibold"
-                            android:text="@string/location"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:id="@+id/tv_location"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="5"
-                            android:textSize="16sp"
-                            tools:text="@string/test_order_location" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_semibold"
-                            android:text="@string/name"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:id="@+id/tv_customer_name"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:textSize="16sp"
-                            tools:text="@string/test_order_customer_name" />
-
-                    </LinearLayout>
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:layout_marginTop="8dp"
-                        android:orientation="horizontal">
-
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:fontFamily="@font/inter_semibold"
-                            android:text="@string/phone_number"
-                            android:textSize="16sp" />
-
-                        <TextView
-                            android:id="@+id/tv_customer_phone_number"
-                            android:layout_width="match_parent"
-                            android:layout_height="wrap_content"
-                            android:layout_marginStart="8dp"
-                            android:ellipsize="end"
-                            android:fontFamily="@font/inter"
-                            android:maxLines="1"
-                            android:textColor="@color/blue"
-                            android:textSize="16sp"
-                            tools:text="@string/test_order_phone_number" />
-
-                    </LinearLayout>
-
-                </LinearLayout>
-
-            </ScrollView>
+            </androidx.cardview.widget.CardView>
 
             <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="0dp"
-                android:layout_marginTop="16dp"
-                android:layout_weight="1">
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp">
 
                 <androidx.recyclerview.widget.RecyclerView
                     android:id="@+id/recycler_view_images"
@@ -259,28 +374,21 @@
 
                 </FrameLayout>
 
-<!--                <ProgressBar-->
-<!--                    android:id="@+id/progress_bar"-->
-<!--                    android:layout_width="wrap_content"-->
-<!--                    android:layout_height="wrap_content"-->
-<!--                    android:layout_gravity="center"-->
-<!--                    android:indeterminateTint="@color/blue" />-->
-
             </FrameLayout>
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btn_sumbit_or_delete_order"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:backgroundTint="@color/blue"
-                android:fontFamily="@font/inter_semibold"
-                android:text="@string/submit_order_btn"
-                android:visibility="invisible"
-                app:cornerRadius="6dp" />
 
         </LinearLayout>
 
-    </FrameLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btn_sumbit_or_delete_order"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_margin="16dp"
+        android:backgroundTint="@color/blue"
+        android:fontFamily="@font/inter_semibold"
+        android:text="@string/submit_order_btn"
+        android:visibility="invisible"
+        app:cornerRadius="6dp" />
 
 </LinearLayout>

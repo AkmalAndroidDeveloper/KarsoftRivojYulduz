@@ -35,4 +35,15 @@
     <string name="no_photos">Нет фотографий</string>
     <string name="the_number_of_photos_should_not_exceed_ten">Количество фото не должно превышать 10 штук</string>
     <string name="choose_photo_for_delete">Выберите фотографии для удаления</string>
+    <string name="meter_has_completed_its_work">Измерчик завершил работу</string>
+    <string name="remake_work">Переделать заказ</string>
+    <string name="new_order">Новый заказ</string>
+    <string name="permission_denied">Доступ запрещён!</string>
+    <string name="permission_granted">Хотите дать разрешение?</string>
+    <string name="more">Подробнее</string>
+    <string name="hide">Скрыть</string>
+    <string name="count">Количество:</string>
+    <string name="width">Ширина:</string>
+    <string name="height">Высота:</string>
+    <string name="service">Услуга:</string>
 </resources>

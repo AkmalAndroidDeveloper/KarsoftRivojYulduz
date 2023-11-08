@@ -30,17 +30,19 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
     private val binding get() = _binding!!
     private val ordersViewModel by viewModel<OrdersAndHistoriesViewModel>()
 
-    companion object {
-        private const val TAG = "HistoriesFragment"
-    }
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         bindView(view)
 
-        initHistoriesAdapter()
+        initValues()
         initObservables()
         initListeners()
+    }
+
+    private fun initValues() {
+        initHistoriesAdapter()
+        setUpRecyclerViewLayoutManager()
+        setUpRecyclerViewAdapter()
     }
 
     private fun turnOnSwipeRefreshEffect() {
@@ -64,17 +66,12 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
                 turnOffSwipeRefreshEffect()
                 initListHistoriesAdapter(it.data)
                 checkAndChangeVisibilityWhenOrderListIsEmpty(it.data)
-                setUpRecyclerViewLayoutManager()
-                setUpRecyclerViewAdapter()
             }.launchIn(lifecycleScope)
             messageFlow.onEach {
                 turnOffSwipeRefreshEffect()
-                toastMessage(it)
-                Log.d(TAG, "MessageFlow: $it")
             }.launchIn(lifecycleScope)
             errorFlow.onEach {
                 turnOffSwipeRefreshEffect()
-                Log.d(TAG, "ErrorFlow: $it")
             }.launchIn(lifecycleScope)
         }
     }
@@ -95,7 +92,7 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
     }
 
     private fun initHistoriesAdapter() {
-        historiesAdapter = HistoriesAdapter()
+        historiesAdapter = HistoriesAdapter(requireContext())
     }
 
     private fun setUpRecyclerViewAdapter() {
@@ -114,15 +111,16 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
             swipeRefreshLayout.setOnRefreshListener {
                 getAllData()
             }
-            historiesAdapter.setOnItemClickListener { order, orderId, title, address, customerName, customerPhoneNumber ->
+            historiesAdapter.setOnItemClickListener { data ->
                 val direction =
                     HistoriesFragmentDirections.actionHistoryFragmentToOrderFragment(
-                        orderId,
+                        data.id,
                         true,
-                        title,
-                        address,
-                        customerName,
-                        customerPhoneNumber
+                        data.contact.title.toString(),
+                        data.contact.address.toString(),
+                        data.contact.name,
+                        data.contact.phone,
+                        data.statusId
                     )
                 navigateTo(direction)
             }
