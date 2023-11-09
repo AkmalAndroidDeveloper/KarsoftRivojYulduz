@@ -98,7 +98,6 @@
                 android:fontFamily="@font/inter"
                 android:maxLines="1"
                 tools:text="11.06.2023"
-                android:textAllCaps="true"
                 android:textColor="@color/black" />
 
         </LinearLayout>
@@ -127,7 +126,6 @@
                 android:fontFamily="@font/inter"
                 android:maxLines="1"
                 tools:text="11.06.2023"
-                android:textAllCaps="true"
                 android:textColor="@color/black" />
 
         </LinearLayout>

@@ -455,7 +455,8 @@ class SubmitOrderFragment : Fragment(R.layout.fragment_submit_order) {
         }.launchIn(lifecycleScope)
         submitOrderViewModel.successSimpleOrderFlow.onEach {
             with(binding) {
-                tvService.text = TextFormator().firstLetterCapitalAndRestAreSmall(it.data.service.title)
+                tvService.text =
+                    TextFormator().firstLetterCapitalAndRestAreSmall(it.data.service.title)
                 if (it.data.height != null)
                     tvHeight.text = "${it.data.height} ${it.data.service.dimension.unit}"
                 else
@@ -771,5 +772,9 @@ class SubmitOrderFragment : Fragment(R.layout.fragment_submit_order) {
         super.onDestroyView()
         unBindView()
         clearLists()
+    }
+
+    override fun onDestroy() {
+        super.onDestroy()
     }
 }

@@ -10,6 +10,8 @@ import com.example.karsoftrivojyulduz.R
 import com.example.karsoftrivojyulduz.databinding.ItemOfRecyclerViewHistoryBinding
 import com.example.karsoftrivojyulduz.domain.model.ordersandhistories.OrderAndHistoryResponseData
 import com.example.karsoftrivojyulduz.util.constant.Constants
+import com.example.karsoftrivojyulduz.util.convertor.TextFormator
+import java.lang.RuntimeException
 
 class HistoriesAdapter(
     private val context: Context
@@ -41,7 +43,36 @@ class HistoriesAdapter(
         }
 
         private fun formatDate(date: String): String {
-            return date.substring(0, date.lastIndexOf(':')).replace(" ", ", ")
+            val fullDate = date.split(' ')[0] //2023-11-07
+            val time = date.split(' ')[1] //04:24:41
+
+            // Date variables
+            val year = fullDate.split('-')[0]
+            val month = getMonth(fullDate.split('-')[1].toInt())
+            val dayOfMonth = fullDate.split('-')[2]
+
+            //Time variables
+            val resultTime = time.substring(0, time.lastIndexOf(':'))
+
+            return "$resultTime,\t$dayOfMonth-$month,\t$year"
+        }
+
+        private fun getMonth(monthValue: Int): String {
+            return when (monthValue) {
+                1 -> "Январь"
+                2 -> "Февраль"
+                3 -> "Март"
+                4 -> "Апрель"
+                5 -> "Май"
+                6 -> "Июнь"
+                7 -> "Июль"
+                8 -> "Август"
+                9 -> "Сентябрь"
+                10 -> "Октябрь"
+                11 -> "Ноябрь"
+                12 -> "Декабрь"
+                else -> throw RuntimeException("Invalid month value in getMonth() method into HistoriesAdapter")
+            }
         }
     }
 
