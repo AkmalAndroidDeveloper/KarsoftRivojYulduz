@@ -116,8 +116,8 @@ class HistoriesFragment : Fragment(R.layout.fragment_histories) {
                     HistoriesFragmentDirections.actionHistoryFragmentToOrderFragment(
                         data.id,
                         true,
-                        data.contact.title.toString(),
-                        data.contact.address.toString(),
+                        (data.contact.title ?: "Не указен").toString(),
+                        (data.contact.address ?: "Не указен").toString(),
                         data.contact.name,
                         data.contact.phone,
                         data.statusId
