@@ -161,8 +161,8 @@ class OrdersFragment : Fragment(R.layout.fragment_orders) {
                 val direction = OrdersFragmentDirections.actionMainFragmentToOrderFragment(
                     data.id,
                     false,
-                    (data.contact.title ?: "Не указен").toString(),
-                    (data.contact.address ?: "Не указен").toString(),
+                    (data.contact.title ?: "Не указан").toString(),
+                    (data.contact.address ?: "Не указан").toString(),
                     data.contact.name,
                     data.contact.phone,
                     data.statusId

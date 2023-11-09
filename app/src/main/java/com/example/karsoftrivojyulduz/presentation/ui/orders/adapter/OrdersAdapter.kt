@@ -24,9 +24,9 @@ class OrdersAdapter(
         @SuppressLint("SetTextI18n")
         fun onBind(data: OrderAndHistoryResponseData.Data) {
             with(binding) {
-                tvOrderTitle.text = (data.contact.title ?: "Не указен").toString()
+                tvOrderTitle.text = (data.contact.title ?: "Не указан").toString()
                 tvOrderId.text = "№${data.id}"
-                tvOrderLocation.text = (data.contact.address ?: "Не указен").toString()
+                tvOrderLocation.text = (data.contact.address ?: "Не указан").toString()
                 tvCustomerPhoneNumber.text = data.contact.phone
 
                 when (data.statusId) {
